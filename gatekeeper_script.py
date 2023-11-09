@@ -72,7 +72,7 @@ def check_cumulative_loss():
         num_loss_tx += 1
     if total_loss > allowed_cumulative_loss/10:
         print(f'Over last 30m, cumulative loss: {total_loss}. num loss tx: {num_loss_tx}')
-    if total_loss > cumulative_loss_duration:
+    if total_loss > allowed_cumulative_loss:
         disable_contract()
         slack_alert('CONTRACT DISABLED', f'''Cumulative loss of ${total_loss}. Risk exceeded''')
 
