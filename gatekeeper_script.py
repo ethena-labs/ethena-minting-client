@@ -117,7 +117,7 @@ if __name__ == '__main__':
                 if redeem_price < eth_price:
                     loss = round((eth_price - redeem_price) * collateral_amount, 2)
                     r.setex(f'loss-redeem-{w3.to_hex(redeem.transactionHash)}', cumulative_loss_duration, loss)
-                    slack_alert('warning', f'''Loss of ${loss}. Redeemed {collateral_amount} {collateral_map[mint.args.collateral_asset]} with {usde_redeemed} USDe. Redeem price: ${redeem_price}. txhash {w3.to_hex(redeem.transactionHash)}''')
+                    slack_alert('warning', f'''Loss of ${loss}. Redeemed {collateral_amount} {collateral_map[redeem.args.collateral_asset]} with {usde_redeemed} USDe. Redeem price: ${redeem_price}. txhash {w3.to_hex(redeem.transactionHash)}''')
                 if redeem_price < (1 - trigger_threshold)*eth_price:
                     disable_contract()
 
