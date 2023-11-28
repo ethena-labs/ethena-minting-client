@@ -7,7 +7,12 @@ import json
 import time
 from enum import Enum, IntEnum
 from dataclasses import dataclass, asdict
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+ETH_NODE_URL = os.getenv('ETH_NODE_URL')
+PKEY = os.getenv('PKEY')
 
 # Example end to end mint of 0.04 stETH to USDe
 # Enter your private key in line 45.
@@ -22,7 +27,7 @@ class Signature:
     signature_bytes: bytes
 
 
-ethena_url = 'https://api.test.ethena.fi/'
+ethena_url = 'https://api.ethena.fi/'
 
 if __name__ == "__main__":
     with open('defi_mint_abi.json') as f:
@@ -33,24 +38,26 @@ if __name__ == "__main__":
 
     w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/841afbfb8c1446a2a5601c19f9dc7777'))
 
-    defi_minting_contract = w3.eth.contract(address='0x980C680a90631c8Ea49fA37B47AbC3154219EC1a', abi=mint_abi)
-    usde_contract = w3.eth.contract(address='0x8191DC3053Fe4564c17694cB203663d3C07B8960', abi=usde_abi)
+    defi_minting_contract = w3.eth.contract(address='0x2CC440b721d2CaFd6D64908D6d8C4aCC57F8Afc3', abi=mint_abi)
+    usde_contract = w3.eth.contract(address='0x4c9EDD5852cd905f086C759E8383e09bff1E68B3', abi=usde_abi)
     stETH_address = '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84'
 
-    rfq_url = f'{ethena_url}rfq?pair=stETH/USDe&side=MINT&size=0.04'
+    rfq_pair = 'stETH/USDe'
+
+    rfq_url = f'{ethena_url}rfq?pair={rfq_pair}&side=MINT&size=0.1'
     response = requests.get(rfq_url)
     rfq_data = response.json()
 
     # your own private key. If you trade through smart contract and use delegateSigner, the private key of your delegated signer
-    acc: LocalAccount = Account.from_key('')
+    acc: LocalAccount = Account.from_key(PKEY)
     print('rfq_data', rfq_data)
     print(acc.address)
 
     # order object sent back to /order endpoint
     mint_order = {
         "order_type": "MINT",
-        "expiry": int(time.time() + 60),
-        "nonce": int(time.time() + 60),
+        "expiry": int(time.time() + 90),
+        "nonce": int(time.time() + 90),
         "benefactor": acc.address,
         "beneficiary": acc.address,
         "collateral_asset": stETH_address,
