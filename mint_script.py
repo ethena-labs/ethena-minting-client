@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 ETH_NODE_URL = os.getenv('ETH_NODE_URL')
+INFURA_API_KEY = os.getenv('INFURA_API_KEY')
 PKEY = os.getenv('PKEY')
 
 # Example end to end mint of 0.04 stETH to USDe
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     with open('defi_usde_abi.json') as f:
         usde_abi = json.load(f)
 
-    w3 = Web3(Web3.HTTPProvider('https://mainnet.infura.io/v3/841afbfb8c1446a2a5601c19f9dc7777'))
+    w3 = Web3(Web3.HTTPProvider(f'https://mainnet.infura.io/v3/{INFURA_API_KEY}'))
 
     defi_minting_contract = w3.eth.contract(address='0x2CC440b721d2CaFd6D64908D6d8C4aCC57F8Afc3', abi=mint_abi)
     usde_contract = w3.eth.contract(address='0x4c9EDD5852cd905f086C759E8383e09bff1E68B3', abi=usde_abi)
