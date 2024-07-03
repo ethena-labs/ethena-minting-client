@@ -17,7 +17,7 @@ Tested under Python 3.11.
 
 ```
 # Create self-contained Python environment:
-$ python -m venv myenv
+$ python -m venv env
 # Activate the environment:
 $ source venv/bin/activate
 # Check version = 3.11
@@ -29,7 +29,6 @@ $ source venv/bin/activate
 ## Run mint
 
 ```
-$ This will run the mint.
 $ ./mint_script_v2.py
 ```
 
