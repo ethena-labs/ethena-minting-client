@@ -1,6 +1,6 @@
 # API Examples
 
-Example scripts interacting with Ethena API
+Example scripts interacting with Ethena Minting API
 
 # Quick start for minting
 
@@ -37,3 +37,9 @@ $ ./mint_script_v2.py
 
 * Q. What is [mint_script.py](mint_script.py)?
 * A. The original mint script which is now obsolete. Use [mint_script_v2.py](mint_script_v2.py) instead.
+
+# Changes in V2
+
+- `rfq_id` returned in the `/rfq` endpoint must now be included as `order_id` within the signed order payload posted to the `/order` endpoint.
+- `rfq_id` is no longer required with the `/order` submission parameters.
+- `signature_type` has been included as optional parameter in the `/order` endpoint.  The default value is `EIP712` with the only other supported value being `EIP1271`; mandatory for orders of that kind.
