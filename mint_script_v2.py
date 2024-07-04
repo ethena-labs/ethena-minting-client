@@ -13,7 +13,7 @@ from web3 import Web3
 
 env_path = find_dotenv()
 load_dotenv(env_path)
-PRIVATE_KEY = os.getenv('BENEFACTOR_KEY')
+PRIVATE_KEY = os.getenv('PKEY')
 INFURA_API_KEY = os.getenv('INFURA_API_KEY')
 
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     )
 
     order_hash = defi_minting_contract.functions.hashOrder(order_tuple).call()
-    order_signed = acc.signHash(order_hash)
+    order_signed = acc.unsafe_sign_hash(order_hash)
     order_rsv = to_bytes(order_signed.r) + to_bytes(order_signed.s) + to_bytes(order_signed.v)
     print('tuple', order_tuple)
     print('rsv', order_rsv)
