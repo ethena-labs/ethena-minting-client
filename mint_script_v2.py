@@ -111,7 +111,7 @@ if __name__ == "__main__":
     signature_hex = to_hex(signature.signature_bytes)
     print('hex', signature_hex)
 
-    url = f'''{ethena_url}order?signature={signature_hex}&rfq_id={rfq_data['rfq_id']}'''
+    url = f'''{ethena_url}order?signature={signature_hex}'''
     response = requests.post(url, json=mint_order)
     if 'error' in response.json():
         print( response.json()['error'])
