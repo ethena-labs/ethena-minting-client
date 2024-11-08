@@ -1,45 +1,17 @@
-# API Examples
+# Ethena Minting SDK
 
-Example scripts interacting with Ethena Minting API
+This repository contains SDKs for interacting with USDe, a synthetic dollar by Ethena.
 
-# Quick start for minting
+## Overview
 
-## Prepare .env file
+The SDKs provide functionality for both minting and redeeming USDe.
 
-```
-$ cp .env.example .env
-# Edit .env file with your credentials. These will be loaded into environment variables on start.
-```
+## Available SDKs
 
-## Install Python
+### Python SDK
 
-Tested under Python 3.11.
+Located in the `/py` directory, the Python SDK provides a simple interface for minting and redeeming USDe tokens. See the Python [README](./py/README.md) for setup and usage instructions.
 
-```
-# Create self-contained Python environment:
-$ python -m venv myenv
-# Activate the environment:
-$ source venv/bin/activate
-# Check version = 3.11
-(venv) $ python3 --version
-# Install requirements
-(venv) $ pip install -r requirements.txt
-```
+### TypeScript SDK
 
-## Run mint
-
-```
-$ This will run the mint.
-$ ./mint_script_v2.py
-```
-
-# FAQ
-
-* Q. What is [mint_script.py](mint_script.py)?
-* A. The original mint script which is now obsolete. Use [mint_script_v2.py](mint_script_v2.py) instead.
-
-# Changes in V2
-
-- `rfq_id` returned in the `/rfq` endpoint must now be included as `order_id` within the signed order payload posted to the `/order` endpoint.
-- `rfq_id` is no longer required with the `/order` submission parameters.
-- `signature_type` has been included as optional parameter in the `/order` endpoint.  The default value is `EIP712` with the only other supported value being `EIP1271`; mandatory for orders of that kind.
+Located in the `/ts` directory, the TypeScript SDK offers minting and redemption functionality with type safety. See the TypeScript [README](./ts/README.md) for setup and usage instructions.
