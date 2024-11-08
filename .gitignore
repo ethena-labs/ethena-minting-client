@@ -1,2 +1,5 @@
 .idea
 .env
+node_modules
+.venv
+.mypy_cache

@@ -1,0 +1,20 @@
+{
+  "name": "ethena-minting-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "mint": "ts-node ts/mint_script.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2",
+    "viem": "^2.21.42"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0"
+  }
+}
