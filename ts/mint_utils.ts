@@ -29,10 +29,11 @@ export async function getRfq(
   pair: string,
   type: string,
   side: "MINT" | "REDEEM",
-  size: number
+  size: number,
+  benefactor: Address
 ) {
   const response = await fetch(
-    `${ETHENA_URL}rfq?pair=${pair}&type_=${type}&side=${side}&size=${size}`
+    `${ETHENA_URL}rfq?pair=${pair}&type_=${type}&side=${side}&size=${size}&benefactor=${benefactor}`
   );
   return (await response.json()) as Rfq;
 }

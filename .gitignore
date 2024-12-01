@@ -3,3 +3,5 @@
 node_modules
 .venv
 .mypy_cache
+py/__pycache__
+py/__pycache__/**.pyc

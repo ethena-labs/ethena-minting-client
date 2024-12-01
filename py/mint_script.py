@@ -51,14 +51,14 @@ if __name__ == "__main__":
         "0xdAC17F958D2ee523a2206206994597C13D831ec7"
     )
 
-    type_ = "ALGO"
-    rfq_url = f"{ethena_url}rfq?pair=USDT/USDe&type_={type_}&side=MINT&size=25"
-    response = requests.get(rfq_url, timeout=5)
-    rfq_data = response.json()
-
     # your own private key. If you trade through smart contract and use delegateSigner, the private key of your delegated signer
     # pylint: disable=no-value-for-parameter
     acc = Account.from_key(PRIVATE_KEY)
+    type_ = "ALGO"
+    rfq_url = f"{ethena_url}rfq?pair=USDT/USDe&type_={type_}&side=MINT&size=25&benefactor={acc.address}"
+    response = requests.get(rfq_url, timeout=5)
+    rfq_data = response.json()
+
     print("rfq_data", rfq_data)
     print(acc.address)
 
