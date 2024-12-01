@@ -1,11 +1,6 @@
 import { Address, createPublicClient, Hex, http } from "viem";
 import "dotenv/config";
-import {
-  createMintOrder,
-  getRfq,
-  signOrder,
-  submitOrder,
-} from "./mint_utils";
+import { createMintOrder, getRfq, signOrder, submitOrder } from "./mint_utils";
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
@@ -33,7 +28,7 @@ async function main() {
 
     // Get RFQ
     const pair = `${COLLATERAL_ASSET}/USDe`;
-    const rfqData = await getRfq(pair, "ALGO", SIDE, AMOUNT);
+    const rfqData = await getRfq(pair, "ALGO", SIDE, AMOUNT, BENEFACTOR);
 
     console.log("RFQ", rfqData);
 
