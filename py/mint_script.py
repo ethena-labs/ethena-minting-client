@@ -65,7 +65,7 @@ if __name__ == "__main__":
     # order object sent back to /order endpoint
     mint_order = {
         "order_id": str(rfq_data["rfq_id"]),
-        "order_type": "MINT",
+        "order_type": rfq_data["side"],
         "expiry": int(time.time() + 60),
         "nonce": int(time.time() + 60),
         "benefactor": acc.address,
