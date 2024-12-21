@@ -48,7 +48,7 @@ export async function createMintOrder(
 
   return {
     order_id: rfqData.rfq_id,
-    order_type: Side.MINT,
+    order_type: rfqData.side,
     expiry,
     nonce: expiry,
     benefactor,
