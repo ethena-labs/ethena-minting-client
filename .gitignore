@@ -2,6 +2,7 @@
 .env
 node_modules
 .venv
+venv
 .mypy_cache
 py/__pycache__
 py/__pycache__/**.pyc
