@@ -50,12 +50,15 @@ if __name__ == "__main__":
     usdt_address = Web3.to_checksum_address(
         "0xdAC17F958D2ee523a2206206994597C13D831ec7"
     )
+    usdc_address = Web3.to_checksum_address(
+        "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    )
 
     # your own private key. If you trade through smart contract and use delegateSigner, the private key of your delegated signer
     # pylint: disable=no-value-for-parameter
     acc = Account.from_key(PRIVATE_KEY)
     type_ = "ALGO"
-    rfq_url = f"{ethena_url}rfq?pair=USDT/USDe&type_={type_}&side=MINT&size=25&benefactor={acc.address}"
+    rfq_url = f"{ethena_url}rfq?pair=USDC/USDe&type_={type_}&side=REDEEM&size=25&benefactor={acc.address}"
     response = requests.get(rfq_url, timeout=5)
     rfq_data = response.json()
 
@@ -70,7 +73,7 @@ if __name__ == "__main__":
         "nonce": int(time.time() + 60),
         "benefactor": acc.address,
         "beneficiary": acc.address,
-        "collateral_asset": usdt_address,
+        "collateral_asset": usdc_address,
         "collateral_amount": int(rfq_data["collateral_amount"]),
         "usde_amount": int(rfq_data["usde_amount"]),
     }
