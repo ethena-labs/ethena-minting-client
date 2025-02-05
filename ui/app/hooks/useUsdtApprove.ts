@@ -14,10 +14,12 @@ export const useUsdtApprove = ({
   amount,
   selectedTokenAddress,
   isAllowed,
+  allowance,
 }: {
   amount: number;
   selectedTokenAddress: Address;
   isAllowed: boolean;
+  allowance: bigint;
 }) => {
   const [hasHandledReset, setHasHandledReset] = useState(false);
 
@@ -102,7 +104,7 @@ export const useUsdtApprove = ({
   const onApprove = async () => {
     if (!address) return;
 
-    if (isAllowed) {
+    if (allowance === BigInt(0)) {
       setHasHandledReset(false);
       writeApprove({
         account: address,

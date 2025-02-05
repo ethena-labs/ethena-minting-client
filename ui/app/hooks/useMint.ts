@@ -117,7 +117,6 @@ export const useMint = ({
       if (!signature) {
         throw new Error("Error signing order");
       }
-      console.log("signature", signature);
 
       const isValidSignature = await publicClient?.readContract({
         address: MINTING_ADDRESS,
@@ -131,7 +130,7 @@ export const useMint = ({
           },
         ],
       });
-      console.log("isValidSignature", isValidSignature);
+
       if (!isValidSignature) {
         throw new Error("Invalid signature");
       }

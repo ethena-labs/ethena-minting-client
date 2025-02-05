@@ -29,7 +29,7 @@ export const Mint = () => {
   );
   const isUSDT = selectedToken?.name === "USDT";
 
-  const { isAllowed, isCheckingAllowance } = useAllowance({
+  const { isAllowed, allowance, isCheckingAllowance } = useAllowance({
     amount: Number(amount),
     selectedTokenAddress,
   });
@@ -47,6 +47,7 @@ export const Mint = () => {
     amount: Number(amount),
     selectedTokenAddress,
     isAllowed,
+    allowance,
   });
 
   const { onMint, isLoading: isMinting } = useMint({
@@ -96,7 +97,6 @@ export const Mint = () => {
               onMint();
             } else {
               if (isUSDT) {
-                console.log("is usdt");
                 onUsdtApprove();
               } else {
                 onApprove();

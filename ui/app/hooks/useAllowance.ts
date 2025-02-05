@@ -34,6 +34,5 @@ export const useAllowance = ({
     });
 
   const isAllowed = allowance >= parsedAmount;
-
-  return { isAllowed, isCheckingAllowance };
+  return { isAllowed, allowance, isCheckingAllowance };
 };
