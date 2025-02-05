@@ -3,13 +3,13 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Address, parseUnits } from "viem";
-import { MINTING_ADDRESS, PAIR_TOKENS } from "@/app/constants/app-config";
+import { Address } from "viem";
+import { MINTING_ADDRESS } from "@/app/constants/app-config";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { TransactionToast } from "@/app/components/Toast";
 import { USDT_ABI } from "@/app/constants/usdt-abi";
-
+import { getParsedAmount } from "@/app/utils/getParsedAmount";
 export const useUsdtApprove = ({
   amount,
   selectedTokenAddress,
@@ -22,13 +22,7 @@ export const useUsdtApprove = ({
   allowance: bigint;
 }) => {
   const [hasHandledReset, setHasHandledReset] = useState(false);
-
-  const selectedToken = PAIR_TOKENS.find(
-    (token) => token.address === selectedTokenAddress
-  );
-  const parsedAmount = BigInt(
-    parseUnits(`${amount}`, selectedToken?.decimals ?? 6)
-  );
+  const parsedAmount = getParsedAmount(amount, selectedTokenAddress);
 
   const { address } = useAccount();
 

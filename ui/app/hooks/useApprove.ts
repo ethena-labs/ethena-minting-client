@@ -4,13 +4,13 @@ import {
   useWriteContract,
 } from "wagmi";
 
-import { Address, erc20Abi, parseUnits } from "viem";
+import { Address, erc20Abi } from "viem";
 import { useSimulateContract } from "wagmi";
 import { MINTING_ADDRESS, PAIR_TOKENS } from "@/app/constants/app-config";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { TransactionToast } from "@/app/components/Toast";
-
+import { getParsedAmount } from "@/app/utils/getParsedAmount";
 export const useApprove = ({
   amount,
   selectedTokenAddress,
@@ -21,9 +21,7 @@ export const useApprove = ({
   const selectedToken = PAIR_TOKENS.find(
     (token) => token.address === selectedTokenAddress
   );
-  const parsedAmount = BigInt(
-    parseUnits(`${amount}`, selectedToken?.decimals ?? 6)
-  );
+  const parsedAmount = getParsedAmount(amount, selectedTokenAddress);
 
   const { address } = useAccount();
   const {

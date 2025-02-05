@@ -1,8 +1,9 @@
-import { parseUnits, Address, erc20Abi } from "viem";
+import { Address, erc20Abi } from "viem";
 
 import { useAccount, useReadContract } from "wagmi";
 
-import { MINTING_ADDRESS, PAIR_TOKENS } from "@/app/constants/app-config";
+import { MINTING_ADDRESS } from "@/app/constants/app-config";
+import { getParsedAmount } from "@/app/utils/getParsedAmount";
 
 export const useAllowance = ({
   amount,
@@ -12,13 +13,7 @@ export const useAllowance = ({
   selectedTokenAddress: Address;
 }) => {
   const { address } = useAccount();
-  const parsedAmount = BigInt(
-    parseUnits(
-      `${amount}`,
-      PAIR_TOKENS.find((token) => token.address === selectedTokenAddress)
-        ?.decimals ?? 6
-    )
-  );
+  const parsedAmount = getParsedAmount(amount, selectedTokenAddress);
 
   const { data: allowance = BigInt(0), isLoading: isCheckingAllowance } =
     useReadContract({
