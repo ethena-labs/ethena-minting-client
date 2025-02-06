@@ -44,7 +44,7 @@ usdc_address = Web3.to_checksum_address('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606e
 mint_address = Web3.to_checksum_address("0xe3490297a08d6fC8Da46Edb7B6142E4F461b62D3")
 usde_address = Web3.to_checksum_address("0x4c9EDD5852cd905f086C759E8383e09bff1E68B3")
 mint_token_map = {
-    "USDT": {"address": usdt_address, "contract": w3.eth.contract(address=usdt_address, abi=erc20_abi), "decimals": 18},
+    "USDT": {"address": usdt_address, "contract": w3.eth.contract(address=usdt_address, abi=erc20_abi), "decimals": 6},
     "USDC": {"address": usdc_address, "contract": w3.eth.contract(address=usdc_address, abi=erc20_abi), "decimals": 6}
 }
 defi_minting_contract = w3.eth.contract(address=mint_address, abi=mint_abi)
