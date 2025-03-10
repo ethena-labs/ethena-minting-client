@@ -43,7 +43,7 @@ class Signature:
 ETHENA_URL = "https://public.api.ethena.fi/"
 ETHENA_PRIVATE_URL = "https://private.api.ethena.fi/"
 ALLOW_INFINITE_APPROVALS = False
-AMOUNT = 23
+AMOUNT = 25
 USDE_ABI = load_abi("py/usde_abi.json")
 MINT_ABI = load_abi("py/mint_abi.json")
 MINT_ADDRESS = Web3.to_checksum_address(
@@ -52,7 +52,6 @@ MINT_ADDRESS = Web3.to_checksum_address(
 USDE_ADDRESS = Web3.to_checksum_address(
     "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
 )
-
 USDT_ADDRESS = Web3.to_checksum_address(
     "0xdAC17F958D2ee523a2206206994597C13D831ec7"
 )
@@ -149,6 +148,12 @@ if __name__ == "__main__":
         )
 
         print("APPROVAL AMOUNT", APPROVAL_AMOUNT)
+
+        # Reset allowance to 0 first if there's an existing allowance (required for USDT)
+        if allowance > 0:
+            print("RESETTING ALLOWANCE TO 0 FIRST (REQUIRED FOR USDT)")
+            reset_tx_hash = approve(w3, USDT_ADDRESS, PRIVATE_KEY, 0)
+            print(f"Allowance reset submitted: https://etherscan.io/tx/{reset_tx_hash}")
 
         tx_hash = approve(w3, USDT_ADDRESS, PRIVATE_KEY, APPROVAL_AMOUNT)
         print(f"Approval submitted: https://etherscan.io/tx/{tx_hash}")

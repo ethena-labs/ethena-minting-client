@@ -67,7 +67,7 @@ async function main() {
       let txHash: Hex;
 
       // Reset allowance for USDT before approving
-      if (COLLATERAL_ASSET === "USDT") {
+      if (COLLATERAL_ASSET === "USDT" && allowance > 0) {
         const revokeTxHash = await approve(
           collateralAddress,
           PRIVATE_KEY,
