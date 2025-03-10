@@ -1,6 +1,15 @@
 import { Address, checksumAddress, createPublicClient, Hex, http } from "viem";
 import "dotenv/config";
-import { createMintOrder, getRfq, signOrder, submitOrder } from "./mint_utils";
+import {
+  approve,
+  bigIntAmount,
+  createMintOrder,
+  getAllowance,
+  getRfq,
+  signOrder,
+  submitOrder,
+  UINT256_MAX,
+} from "./mint_utils";
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
@@ -55,12 +64,31 @@ async function main() {
     // Determine if approval required
     if (allowance < bigIntAmount(AMOUNT)) {
       // Approving
-      const txHash = await approve(
+      let txHash: Hex;
+
+      // Reset allowance for USDT before approving
+      if (COLLATERAL_ASSET === "USDT") {
+        const revokeTxHash = await approve(
+          collateralAddress,
+          PRIVATE_KEY,
+          bigIntAmount(0)
+        );
+        await publicClient.waitForTransactionReceipt({
+          hash: revokeTxHash,
+          confirmations: 1,
+        });
+        console.log(
+          `Revoke submitted: https://etherscan.io/tx/${revokeTxHash}`
+        );
+      }
+
+      txHash = await approve(
         collateralAddress,
         PRIVATE_KEY,
         ALLOW_INFINITE_APPROVALS ? UINT256_MAX : bigIntAmount(AMOUNT)
       );
       console.log(`Approval submitted: https://etherscan.io/tx/${txHash}`);
+
       // Wait for the transaction to be mined
       await publicClient.waitForTransactionReceipt({
         hash: txHash,
