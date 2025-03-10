@@ -1,15 +1,6 @@
-import { Address, createPublicClient, Hex, http } from "viem";
+import { Address, checksumAddress, createPublicClient, Hex, http } from "viem";
 import "dotenv/config";
-import {
-  approve,
-  bigIntAmount,
-  createMintOrder,
-  getAllowance,
-  getRfq,
-  signOrder,
-  submitOrder,
-  UINT256_MAX,
-} from "./mint_utils";
+import { createMintOrder, getRfq, signOrder, submitOrder } from "./mint_utils";
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
@@ -19,8 +10,9 @@ import { Side } from "./types";
 // Configuration
 const AMOUNT: number = 25; // Amount in USD
 const COLLATERAL_ASSET: "USDT" | "USDC" = "USDT";
-const BENEFACTOR: Address =
-  "0x71aD9532857fD983A5b42282104393c4504aC26f" as Address; // Replace with your address
+const BENEFACTOR: Address = checksumAddress(
+  "0x3Aa3Fd1B762CaC519D405297CE630beD30430b00" // Replace with your address
+) as Address;
 const SIDE: "MINT" | "REDEEM" = "MINT";
 
 const PRIVATE_KEY: Hex = process.env.PRIVATE_KEY as Hex;
