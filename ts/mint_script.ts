@@ -1,6 +1,15 @@
 import { Address, checksumAddress, createPublicClient, Hex, http } from "viem";
 import "dotenv/config";
-import { createMintOrder, getRfq, signOrder, submitOrder } from "./mint_utils";
+import {
+  approve,
+  bigIntAmount,
+  createMintOrder,
+  getAllowance,
+  getRfq,
+  signOrder,
+  submitOrder,
+  UINT256_MAX,
+} from "./mint_utils";
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
@@ -16,13 +25,18 @@ const BENEFACTOR: Address = checksumAddress(
 const SIDE: "MINT" | "REDEEM" = "MINT";
 
 const PRIVATE_KEY: Hex = process.env.PRIVATE_KEY as Hex;
-
+const ALLOW_INFINITE_APPROVALS = false;
 // Asset addresses
 const USDC_ADDRESS: Address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const USDT_ADDRESS: Address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
 
 async function main() {
   try {
+    const publicClient = createPublicClient({
+      chain: mainnet,
+      transport: http(process.env.RPC_URL as string),
+    });
+
     // Determine collateral asset address
     const collateralAddress =
       COLLATERAL_ASSET === "USDC" ? USDC_ADDRESS : USDT_ADDRESS;
@@ -43,6 +57,45 @@ async function main() {
 
     console.log("Order", order);
 
+    // Get allowance
+    const allowance = await getAllowance(collateralAddress, PRIVATE_KEY);
+    console.log("Allowance", allowance);
+
+    // Determine if approval required
+    if (allowance < bigIntAmount(AMOUNT)) {
+      // Approving
+      let txHash: Hex;
+
+      // Reset allowance for USDT before approving
+      if (COLLATERAL_ASSET === "USDT" && allowance > 0) {
+        const revokeTxHash = await approve(
+          collateralAddress,
+          PRIVATE_KEY,
+          bigIntAmount(0)
+        );
+        await publicClient.waitForTransactionReceipt({
+          hash: revokeTxHash,
+          confirmations: 1,
+        });
+        console.log(
+          `Revoke submitted: https://etherscan.io/tx/${revokeTxHash}`
+        );
+      }
+
+      txHash = await approve(
+        collateralAddress,
+        PRIVATE_KEY,
+        ALLOW_INFINITE_APPROVALS ? UINT256_MAX : bigIntAmount(AMOUNT)
+      );
+      console.log(`Approval submitted: https://etherscan.io/tx/${txHash}`);
+
+      // Wait for the transaction to be mined
+      await publicClient.waitForTransactionReceipt({
+        hash: txHash,
+        confirmations: 1,
+      });
+    }
+
     const orderSigning = {
       ...order,
       nonce: BigInt(order.nonce),
@@ -60,11 +113,6 @@ async function main() {
     const signature = await signOrder(orderSigning, PRIVATE_KEY);
 
     console.log("Signature", signature);
-
-    const publicClient = createPublicClient({
-      chain: mainnet,
-      transport: http(process.env.RPC_URL as string),
-    });
 
     const isValidSignature = await publicClient.readContract({
       address: MINT_ADDRESS,
