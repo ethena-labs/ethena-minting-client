@@ -3,3 +3,4 @@ python-dotenv==1.0.0
 hexbytes==0.3.1
 aiohttp==3.10.11
 requests==2.32.3
+setuptools==79.0.1
