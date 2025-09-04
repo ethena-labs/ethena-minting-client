@@ -9,6 +9,10 @@ import {
   MINTING_TOKEN_NAME,
   WAGMI_PROJECT_ID,
 } from "@/app/constants/app-config";
+import { fallback, http } from "viem";
+const RPC_CONFIG = {
+  batch: { wait: 25 },
+};
 
 const queryClient = new QueryClient();
 
@@ -17,6 +21,18 @@ export const config = getDefaultConfig({
   projectId: WAGMI_PROJECT_ID,
   chains: [mainnet],
   ssr: true,
+  transports: {
+    [mainnet.id]: fallback(
+      [
+        "https://eth.drpc.org",
+        "https://1rpc.io/eth",
+        "https://cloudflare-eth.com",
+        "https://ethereum-rpc.publicnode.com",
+        "https://rpc.mevblocker.io",
+        "https://rpc.flashbots.net",
+      ].map((url) => http(url, RPC_CONFIG))
+    ),
+  },
 });
 
 export const WalletProvider = ({ children }: { children: React.ReactNode }) => {

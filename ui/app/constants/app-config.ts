@@ -9,7 +9,7 @@ export const MINTING_ADDRESS = IS_PROD
   : "0x8a39215693aaB95038727fB31EBe19ce18903885";
 export const MINTING_TOKEN_NAME = "USDe";
 export const MINTING_TOKEN_URL = IS_PROD
-  ? "https://public.api.ethena.fi/"
+  ? "https://public.api.ethena.fi"
   : "https://public.api.staging.ethena.fi";
 
 export const PAIR_TOKENS = [
