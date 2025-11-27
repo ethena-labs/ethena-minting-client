@@ -157,7 +157,7 @@ if __name__ == "__main__":
 
         signature_hex = to_hex(signature.signature_bytes)
         print("hex", signature_hex)
-        exit()
+
         url = f"""{ETHENA_URL}order?signature={signature_hex}"""
         response = requests.post(url, json=mint_order, timeout=60)
         if "error" in response.json():
