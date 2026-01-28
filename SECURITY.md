@@ -1,0 +1,223 @@
+# Security Policy
+
+## Security Updates
+
+This repository has been updated to address critical security vulnerabilities across multiple dependencies. All dependencies, dev dependencies, peer dependencies, and package overrides have been configured to use secure versions where available.
+
+---
+
+## CVE-2026-23864 - Next.js and React Server Components
+
+### Overview
+**CVE-2026-23864** - Critical security vulnerability affecting Next.js and React Server Components.
+
+### Vulnerability Details
+This vulnerability could potentially allow:
+- Remote code execution (RCE) through unsafe deserialization
+- Denial of Service (DoS) attacks
+- Source code exposure
+
+### Remediation
+All affected packages have been upgraded to the following secure versions:
+
+- **Next.js**: `15.5.10` (upgraded from `15.4.10`)
+- **React**: `19.2.4` (upgraded from `19.0.1`)
+- **react-dom**: `19.2.4` (upgraded from `19.0.1`)
+- **eslint-config-next**: `15.5.10` (upgraded from `15.4.10`)
+
+### References
+- [Vercel Security Advisory - CVE-2026-23864](https://vercel.com/changelog/summary-of-cve-2026-23864)
+
+---
+
+## h3 Request Smuggling (TE.TE) Vulnerability
+
+### Overview
+**Issue #59** - Critical HTTP Request Smuggling vulnerability in h3 v1.
+
+### Vulnerability Details
+- **Affected versions**: `<= 1.15.4`
+- **Patched version**: `>= 1.15.5`
+- **Severity**: Critical
+
+The vulnerability occurs because `readRawBody` performs a strict case-sensitive check for the `Transfer-Encoding` header. It explicitly looks for "chunked", but per RFC, this header should be case-insensitive. If a request is sent with `Transfer-Encoding: ChuNked` (mixed case), h3 misses it and assumes the body is empty, leaving the actual body on the socket. This triggers a classic TE.TE Desync (Request Smuggling) attack when running behind Layer 4 proxies or anything that doesn't normalize headers.
+
+### Impact
+Since H3/Nuxt/Nitro is often used in containerized setups behind TCP load balancers, an attacker can use this to smuggle requests past WAFs or desynchronize the socket to poison other users' connections.
+
+### Remediation
+- **h3**: Overridden to `>= 1.15.5` via pnpm overrides
+- **Transitive dependencies**: Fixed via `@rainbow-me/rainbowkit`, `@walletconnect/core`, `@walletconnect/utils`, and `wagmi`
+
+### References
+- [h3 Issue #59](https://github.com/unjs/h3/issues/59)
+
+---
+
+## Preact JSON VNode Injection Vulnerability
+
+### Overview
+**Issue #56** - HTML Injection via JSON Type Confusion in Preact.
+
+### Vulnerability Details
+- **Affected versions**: `>= 10.26.5, < 10.26.10` | `>= 10.27.0, < 10.27.3` | `>= 10.28.0, < 10.28.2`
+- **Patched versions**: `10.26.10` | `10.27.3` | `10.28.2`
+- **Severity**: Low to Medium
+
+A regression introduced in Preact 10.26.5 caused JSON serialization protection to be softened. In applications where values from JSON payloads are assumed to be strings and passed unmodified to Preact as children, a specially-crafted JSON payload could be constructed that would be incorrectly treated as a valid VNode, resulting in HTML injection.
+
+### Impact
+- Applications are vulnerable if they:
+  - Pass unmodified, unsanitized values from user-modifiable data sources directly into the render tree
+  - Assume these values are strings but the data source could return actual JavaScript objects
+  - Have insecure API design (no type validation) or a compromised data source
+
+### Remediation
+- **preact**: Overridden to patched versions via pnpm overrides:
+  - `>= 10.26.5 < 10.26.10` → `>= 10.26.10`
+  - `>= 10.27.0 < 10.27.3` → `>= 10.27.3`
+  - `>= 10.28.0 < 10.28.2` → `>= 10.28.2`
+
+### References
+- [Preact Security Advisory](https://github.com/preactjs/preact/security/advisories)
+
+---
+
+## @coinbase/wallet-sdk Security Vulnerability
+
+### Overview
+Security vulnerability in outdated versions of Coinbase Wallet SDK.
+
+### Vulnerability Details
+- **Affected versions**: `>= 4.0.0-beta.0, < 4.3.0`
+- **Patched version**: `>= 4.3.0`
+- **Impact**: Does not directly affect users' keys, smart contracts, or funds
+
+### Remediation
+- **@coinbase/wallet-sdk**: Overridden to `>= 4.3.0` via pnpm overrides
+- **Transitive dependencies**: Fixed via `@rainbow-me/rainbowkit` and `wagmi`
+
+---
+
+## Elliptic Cryptographic Vulnerability
+
+### Overview
+**Issue #57** - ECDSA implementation vulnerability in Elliptic package.
+
+### Vulnerability Details
+- **Affected versions**: `<= 6.6.1` (all known versions)
+- **Patched version**: **None available at this time**
+- **Severity**: High
+
+The ECDSA implementation generates incorrect signatures if an interim value of 'k' (as computed based on step 3.2 of RFC 6979) has leading zeros and is susceptible to cryptanalysis, which can lead to secret key exposure. The byte-length of 'k' is incorrectly computed, resulting in truncation during computation.
+
+### Impact
+- Legitimate transactions or communications will be broken
+- Under certain conditions, attackers could derive the secret key if they obtain both a faulty signature generated by a vulnerable version and a correct signature for the same inputs
+
+### Current Status
+⚠️ **No patch available** - This affects all known versions of Elliptic (versions less than or equal to 6.6.1).
+
+### Transitive Dependencies
+- Introduced via `@rainbow-me/rainbowkit` and `wagmi`
+
+### Recommendations
+- Monitor for updates from the Elliptic maintainers
+- Consider alternative cryptographic libraries if possible
+- Review usage of affected packages and assess risk based on your use case
+
+### References
+- [Elliptic GitHub Issues](https://github.com/indutny/elliptic)
+
+---
+
+## jsdiff (diff) Denial of Service Vulnerability
+
+### Overview
+**Issue #61** - Denial of Service vulnerability in `parsePatch` and `applyPatch` methods.
+
+### Vulnerability Details
+- **Affected versions**: `< 4.0.4` or `< 8.0.3` (depending on major version)
+- **Patched versions**: `>= 4.0.4` or `>= 8.0.3`
+- **Severity**: Medium
+
+Attempting to parse a patch whose filename headers contain the line break characters `\r`, `\u2028`, or `\u2029` can cause the `parsePatch` method to enter an infinite loop, consuming memory without limit until the process crashes.
+
+### Impact
+- Applications are vulnerable to denial-of-service attacks if they call `parsePatch` with user-provided patches
+- A large payload is not needed to trigger the vulnerability
+- Some applications may be vulnerable even when calling `parsePatch` on patches generated by the application itself if users can control filename headers
+
+### Remediation
+- **diff/jsdiff**: Overridden to secure versions via pnpm overrides in root `package.json`:
+  - `< 4.0.4` → `>= 4.0.4`
+  - `>= 5.0.0 < 8.0.3` → `>= 8.0.3`
+- **Transitive dependency**: Fixed via `ts-node`
+
+### References
+- [jsdiff PR #649](https://github.com/kpdecker/jsdiff/pull/649)
+
+---
+
+## Package Overrides Summary
+
+### ui/package.json Overrides
+The following overrides are configured in `ui/package.json`:
+
+```json
+{
+  "h3@<=1.15.4": ">=1.15.5",
+  "preact@>=10.26.5 <10.26.10": ">=10.26.10",
+  "preact@>=10.27.0 <10.27.3": ">=10.27.3",
+  "preact@>=10.28.0 <10.28.2": ">=10.28.2",
+  "@coinbase/wallet-sdk@>=4.0.0-beta.0 <4.3.0": ">=4.3.0",
+  "react@>=19.2.0 <19.2.4": ">=19.2.4",
+  "react-dom@>=19.2.0 <19.2.4": ">=19.2.4",
+  "next@>=15.5.0 <15.5.10": ">=15.5.10"
+}
+```
+
+### Root package.json Overrides
+The following overrides are configured in root `package.json`:
+
+```json
+{
+  "diff@<4.0.4": ">=4.0.4",
+  "diff@>=5.0.0 <8.0.3": ">=8.0.3"
+}
+```
+
+---
+
+## Installation
+
+After these updates, run:
+
+```bash
+# Install UI dependencies
+cd ui
+pnpm install
+
+# Install root dependencies
+cd ..
+pnpm install
+```
+
+This will ensure all dependencies are resolved to the secure versions specified in the package.json files and overrides.
+
+---
+
+## Reporting Security Issues
+
+If you discover a security vulnerability in this repository, please report it responsibly by contacting the maintainers directly rather than opening a public issue.
+
+---
+
+## References
+
+- [Vercel Security Advisory - CVE-2026-23864](https://vercel.com/changelog/summary-of-cve-2026-23864)
+- [Next.js Security Updates](https://nextjs.org/docs/app/building-your-application/upgrading)
+- [React Security Updates](https://react.dev/blog)
+- [h3 GitHub Issues](https://github.com/unjs/h3/issues)
+- [Preact Security Advisories](https://github.com/preactjs/preact/security/advisories)
+

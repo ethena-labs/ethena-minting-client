@@ -16,5 +16,11 @@
   },
   "devDependencies": {
     "@types/node": "^22.9.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "diff@<4.0.4": ">=4.0.4",
+      "diff@>=5.0.0 <8.0.3": ">=8.0.3"
+    }
   }
 }
