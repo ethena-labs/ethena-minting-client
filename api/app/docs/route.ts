@@ -35,7 +35,7 @@ const config = {
       font-weight: 600;
     }
   `,
-  favicon: '/favicon.svg',
+  favicon: '/favicon.ico',
   searchHotKey: 'k' as const,
   hiddenClients: ['unirest'],
   defaultHttpClient: {
