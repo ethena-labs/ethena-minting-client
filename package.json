@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "mint": "ts-node ts/mint_script.ts"
+    "mint": "ts-node ts/mint_script.ts",
+    "api:dev": "cd api && pnpm run dev",
+    "api:build": "cd api && pnpm run build",
+    "api:start": "cd api && pnpm run start",
+    "api:openapi:generate": "cd api && pnpm run openapi:generate",
+    "api:lint": "cd api && pnpm run lint",
+    "api:type-check": "cd api && pnpm run type-check"
   },
   "keywords": [],
   "author": "",

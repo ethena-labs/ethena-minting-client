@@ -1,0 +1,70 @@
+{
+  "schemaType": "zod",
+  "schemaDir": "./schemas",
+  "apiDir": "./app/api",
+  "outputFile": "./openapi.json",
+  "outputDir": "./public",
+  "includeOpenApiRoutes": false,
+  "ignoreRoutes": ["/openapi", "/docs"],
+  "generateSchemaDescriptions": true,
+  "defaultResponseSet": "default",
+  "responseSets": {
+    "default": ["400", "500"],
+    "minting": ["400", "500"]
+  },
+  "errorConfig": {
+    "template": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "example": "{{ERROR_CODE}}"
+            },
+            "message": {
+              "type": "string",
+              "example": "{{ERROR_MESSAGE}}"
+            }
+          },
+          "required": ["code", "message"]
+        }
+      },
+      "required": ["error"]
+    },
+    "codes": {
+      "400": {
+        "description": "Bad Request",
+        "variables": {
+          "ERROR_CODE": "INVALID_PARAMS",
+          "ERROR_MESSAGE": "Invalid request parameters"
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "variables": {
+          "ERROR_CODE": "INTERNAL_ERROR",
+          "ERROR_MESSAGE": "An unexpected error occurred"
+        }
+      }
+    }
+  },
+  "openapi": {
+    "info": {
+      "title": "Ethena Minting API",
+      "version": "1.0.0",
+      "description": "API for minting and redeeming USDe tokens.\n\n## Overview\nThis API allows you to:\n- Get quotes (RFQ) for minting or redeeming USDe tokens\n- Submit signed orders to execute mint or redeem operations\n\n## Authentication\nThis API does not require authentication. All endpoints are publicly accessible.\n\n## Order Signing\nOrders must be signed using EIP-712 before submission. The order structure includes:\n- order_id (from RFQ response)\n- order_type (0 for MINT, 1 for REDEEM)\n- expiry (Unix timestamp)\n- nonce (unique identifier)\n- benefactor, beneficiary, collateral_asset addresses\n- collateral_amount and usde_amount (from RFQ response)"
+    },
+    "servers": [
+      {
+        "url": "https://public.api.ethena.fi",
+        "description": "Production API"
+      }
+    ],
+    "tags": [
+      { "name": "Minting", "description": "USDe minting and redemption operations" }
+    ]
+  }
+}
+
