@@ -18,9 +18,9 @@ export const RfqQueryParams = z.object({
     .string()
     .describe('Trading pair (e.g., "USDT/USDe", "USDC/USDe")'),
   type_: z
-    .string()
+    .enum(['ALGO', 'UI'])
     .default('ALGO')
-    .describe('RFQ type (default: "ALGO")'),
+    .describe('RFQ type identifier. Use "ALGO" for algorithmic trading or "UI" for user interface requests. Defaults to "ALGO" if not provided. Note: The parameter name must be "type_" (with underscore), not "type".'),
   side: Side.describe('Order side: MINT or REDEEM'),
   size: z
     .number()
