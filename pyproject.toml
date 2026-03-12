@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ethena-minting-client"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "web3==6.4.0",
+    "python-dotenv==1.0.0",
+    "hexbytes==0.3.1",
+    "aiohttp==3.13.3",
+    "requests==2.32.4",
+    "setuptools==79.0.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "mypy",
+    "types-requests",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM", "TCH", "PTH", "ERA", "PL", "TRY", "RUF"]
