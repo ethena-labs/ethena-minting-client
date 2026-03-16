@@ -159,6 +159,126 @@ Attempting to parse a patch whose filename headers contain the line break charac
 
 ---
 
+## minimatch Regular Expression DoS Vulnerabilities
+
+### Overview
+- **Issue #73** - ReDoS via repeated wildcards with non-matching literal
+- **Issue #79** - ReDoS via multiple non-adjacent GLOBSTAR segments
+- **Issue #78** - ReDoS via nested `*()` / `+()` extglobs generating catastrophic backtracking regexes
+
+### Vulnerability Details
+- **Affected versions**: `< 3.1.3` and `< 3.1.4` (depending on the specific issue)
+- **Patched versions**: `>= 3.1.4`
+- **Severity**: Medium to High (DoS)
+
+`minimatch` compiles glob patterns into regular expressions. Certain patterns (many consecutive `*`, multiple `**` segments, or nested extglobs like `*(*(*(a|b)))`) result in regexes that exhibit catastrophic backtracking in V8, causing CPU to spike and the Node.js event loop to stall for seconds to minutes on relatively small inputs.
+
+### Impact
+- Any code path that accepts attacker-controlled glob patterns and passes them into `minimatch()` is vulnerable to Denial of Service
+- Realistic surfaces include configuration-driven tooling or multi-tenant systems where one tenant controls glob rules used in a shared process
+
+In this repo, `minimatch` is only pulled in transitively via `eslint` / `@eslint/eslintrc` / `eslint-config-next`, which are used as **dev tooling**. They are not part of the production runtime of the Next.js app.
+
+### Remediation
+- **minimatch**: Overridden to `>= 3.1.4` via pnpm overrides in `ui/package.json`:
+  - `minimatch@<3.1.4` → `>= 3.1.4`
+
+This ensures ESLint and related tooling use the patched version even if their own dependency ranges are looser.
+
+---
+
+## @isaacs/brace-expansion Uncontrolled Resource Consumption
+
+### Overview
+**Issue #64** - Uncontrolled resource consumption via unbounded brace range expansion.
+
+### Vulnerability Details
+- **Affected versions**: `<= 5.0.0`
+- **Patched version**: `>= 5.0.1`
+- **Severity**: Medium (DoS)
+
+`@isaacs/brace-expansion` eagerly and synchronously expands brace patterns like `{0..99}{0..99}{0..99}{0..99}{0..99}` into all combinations, causing exponential growth in CPU and memory usage and potentially crashing the Node.js process.
+
+### Impact
+- Any feature that allows untrusted input to be passed into brace expansion can be used for a Denial of Service attack
+- In this repo, it is only used via `tailwindcss` / `tailwindcss-animate` build tooling, not in the production request path
+
+### Remediation
+- **@isaacs/brace-expansion**: Overridden to `>= 5.0.1` via pnpm overrides in `ui/package.json`:
+  - `@isaacs/brace-expansion@<=5.0.0` → `>=5.0.1`
+
+---
+
+## flatted DoS via Unbounded Recursion in `parse()` Revive Phase
+
+### Overview
+**Issue #80** - DoS via unbounded recursion in `flatted.parse()` when reviving circular references.
+
+### Vulnerability Details
+- **Affected versions**: `< 3.4.0`
+- **Patched version**: `>= 3.4.0`
+- **Severity**: Medium (DoS)
+
+`flatted.parse()` previously used a deeply recursive revive strategy that could overflow the stack or consume excessive resources when given specially crafted payloads with deeply nested or self-referential indices.
+
+### Impact
+- Any code that passes attacker-controlled payloads into `flatted.parse()` can be crashed
+- In this repo, `flatted` is pulled in via ESLint tooling (via `eslint` / `eslint-config-next`), not the production app runtime
+
+### Remediation
+- **flatted**: Overridden to `>= 3.4.0` via pnpm overrides in `ui/package.json`:
+  - `flatted@<3.4.0` → `>=3.4.0`
+
+---
+
+## ajv ReDoS When Using `$data` Option
+
+### Overview
+**Issue #68** - ReDoS in `ajv` when the `$data` option is enabled.
+
+### Vulnerability Details
+- **Affected versions**: `< 6.14.0` (for the v6 line)
+- **Patched version**: `>= 6.14.0`
+- **Severity**: Medium to High (DoS) when `$data: true` is used
+
+When `$data` is enabled, `ajv` allows runtime data to be used as patterns and passes them directly to `RegExp()` without validation. A malicious pattern (for example, `^(a|a)*$`) combined with crafted input can cause catastrophic backtracking and long CPU stalls.
+
+### Impact
+- Any code using `ajv` with `$data: true` on untrusted input is vulnerable
+- In this repo, `ajv` is only introduced transitively through ESLint-related tooling and is **not used directly** by the runtime app
+
+### Remediation
+- **ajv**: Overridden to `>= 6.14.0` via pnpm overrides in `ui/package.json`:
+  - `ajv@<6.14.0` → `>=6.14.0`
+
+---
+
+## bn.js Infinite Loop in `maskn(0)`
+
+### Overview
+**Issue #71** - Infinite loop / process hang in `bn.js` when `maskn(0)` is called.
+
+### Vulnerability Details
+- **Affected versions**: `< 4.12.3` and `< 5.2.3`
+- **Patched versions**:
+  - `>= 4.12.3` for the 4.x line
+  - `>= 5.2.3` for the 5.x line
+- **Severity**: Medium (DoS) but potentially higher if used in critical crypto flows
+
+Calling `maskn(0)` on a `BN` instance in vulnerable versions corrupts internal state and can cause methods like `toString()` and `divmod()` to enter infinite loops, hanging the process.
+
+### Impact
+- In this repo, `bn.js` is introduced transitively via `@rainbow-me/rainbowkit` and `wagmi`, which are used in the wallet/connector stack of the UI
+- That means this is part of the **runtime client/web3 interaction layer**, not just tooling
+
+### Remediation
+- **bn.js**: Overridden to `>= 4.12.3` via pnpm overrides in `ui/package.json`:
+  - `bn.js@<4.12.3` → `>=4.12.3`
+
+This ensures the patched version is used even if upstream packages haven't yet bumped their dependency ranges.
+
+---
+
 ## Package Overrides Summary
 
 ### ui/package.json Overrides
@@ -173,7 +293,12 @@ The following overrides are configured in `ui/package.json`:
   "@coinbase/wallet-sdk@>=4.0.0-beta.0 <4.3.0": ">=4.3.0",
   "react@>=19.2.0 <19.2.4": ">=19.2.4",
   "react-dom@>=19.2.0 <19.2.4": ">=19.2.4",
-  "next@>=15.5.0 <15.5.10": ">=15.5.10"
+  "next@>=15.5.0 <15.5.10": ">=15.5.10",
+  "minimatch@<3.1.4": ">=3.1.4",
+  "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1",
+  "flatted@<3.4.0": ">=3.4.0",
+  "ajv@<6.14.0": ">=6.14.0",
+  "bn.js@<4.12.3": ">=4.12.3"
 }
 ```
 
