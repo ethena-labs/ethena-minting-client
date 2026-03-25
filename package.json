@@ -15,7 +15,7 @@
     "viem": "^2.21.42"
   },
   "devDependencies": {
-    "@types/node": "^22.9.0"
+    "@types/node": "22.9.0"
   },
   "pnpm": {
     "overrides": {
