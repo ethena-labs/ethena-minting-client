@@ -279,6 +279,61 @@ This ensures the patched version is used even if upstream packages haven't yet b
 
 ---
 
+## Axios CRLF Header Injection / IMDSv2 Bypass & NO_PROXY SSRF (#126, #128)
+
+### Overview
+Two related vulnerabilities in Axios (npm) affecting all `>= 1.0.0, < 1.15.0`.
+
+### Vulnerability Details
+- **CVE / Issues**: #126 (CRLF header injection chain → IMDSv2 bypass, CVSS 9.9), #128 (NO_PROXY hostname normalisation bypass → SSRF)
+- **Affected versions**: `>= 1.0.0, < 1.15.0`
+- **Patched version**: `1.15.0`
+- **Severity**: Critical (#126), High (#128)
+
+**#126 — CRLF Header Injection:** If any dependency in the stack has a prototype-pollution vulnerability, polluted `Object.prototype` properties are merged into Axios request headers without CRLF sanitisation. A crafted `\r\n` sequence in a header value becomes a request-smuggling payload, enabling AWS IMDSv2 bypass and IAM credential theft.
+
+**#128 — NO_PROXY Bypass:** Axios performs literal string comparison for `NO_PROXY` rules. Hostnames with a trailing dot (`localhost.`) or IPv6 literals (`[::1]`) bypass the check and are incorrectly proxied through any configured HTTP proxy, undermining SSRF protections.
+
+### Remediation
+- **Mitigation date**: 2026-04-16
+- **Mitigation type**: pnpm override (transitive — blocked from direct parent upgrade)
+- **axios**: Overridden to `1.15.0` via pnpm override in `ui/package.json`
+- **Transitive paths fixed**: `@rainbow-me/rainbowkit → axios` and `wagmi → axios`
+- **Validation**: pnpm lockfile regenerated; `axios@1.13.6` no longer present
+
+### Impact Surface
+`axios` is a runtime dependency of `@rainbow-me/rainbowkit` and `wagmi` (wallet connection stack). These libraries run **client-side in the browser** — a backend SSRF or IMDSv2 attack is not directly applicable in this context. The prototype-pollution gadget chain (CWE-113) remains a theoretical risk if any other browser-side dependency introduces prototype pollution, but no such dependency is currently present.
+
+---
+
+## web3.py SSRF via CCIP Read / EIP-3668 OffchainLookup (#121, #122)
+
+### Overview
+**Issues #121 (requirements.txt) and #122 (uv.lock)** — SSRF in web3.py's CCIP Read implementation.
+
+### Vulnerability Details
+- **Affected versions**: `>= 6.0.0b3, < 7.15.0`
+- **Patched version**: `7.15.0`
+- **Severity**: High (SSRF — blind and redirect-amplified)
+
+web3.py's `handle_offchain_lookup()` and `async_handle_offchain_lookup()` issue HTTP requests to URLs supplied by smart contracts via `OffchainLookup` reverts (EIP-3668), without:
+- Restricting to `https://`
+- Blocking private/reserved IP ranges (loopback, link-local, RFC1918)
+- Validating redirect targets
+
+CCIP Read is **enabled by default** (`global_ccip_read_enabled = True`). A malicious contract can force the web3.py process to probe or exfiltrate from internal services (including AWS cloud metadata endpoints).
+
+### Remediation
+- **Mitigation date**: 2026-04-16
+- **Mitigation type**: Direct dependency upgrade
+- **web3**: Bumped from `7.14.1` → `7.15.0` in `pyproject.toml` and `requirements.txt`
+- **Validation**: `uv lock` regenerated; `web3 v7.14.1` no longer present
+
+### Impact Surface
+`web3.py` is used in the Python minting client for on-chain interactions (eth_call / contract calls). Any call against an untrusted contract address could trigger CCIP Read. Post-upgrade the library applies destination validation and redirect controls per the EIP-3668 security recommendations.
+
+---
+
 ## Package Overrides Summary
 
 ### ui/package.json Overrides
@@ -298,7 +353,8 @@ The following overrides are configured in `ui/package.json`:
   "@isaacs/brace-expansion@<=5.0.0": ">=5.0.1",
   "flatted@<3.4.0": ">=3.4.0",
   "ajv@<6.14.0": ">=6.14.0",
-  "bn.js@<4.12.3": ">=4.12.3"
+  "bn.js@<4.12.3": ">=4.12.3",
+  "axios@>=1.0.0 <1.15.0": "1.15.0"
 }
 ```
 
