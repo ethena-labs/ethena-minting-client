@@ -16,6 +16,7 @@ dependencies = [
 ]
 
 [tool.uv]
+exclude-newer = "10 days"
 dev-dependencies = [
     "mypy",
     "types-requests",
