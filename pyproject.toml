@@ -21,6 +21,9 @@ dev-dependencies = [
     "mypy",
     "types-requests",
 ]
+override-dependencies = [
+    "urllib3>=2.7.0",
+]
 
 [tool.ruff]
 target-version = "py312"
