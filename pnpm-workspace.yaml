@@ -1,0 +1,23 @@
+# pnpm-specific settings live here. pnpm v11 no longer reads the package.json
+# "pnpm" field, nor non-auth/registry settings from .npmrc.
+
+# Supply-chain hardening
+# Refuse to install package versions younger than 10 days
+minimumReleaseAge: 14400
+# Fail (don't silently downgrade) if a package's publisher trust level drops
+trustPolicy: no-downgrade
+# Known-benign provenance downgrades, vetted and exempted from no-downgrade.
+# Each is a maintainer that stopped publishing with npm provenance (not an
+# attack). See nodejs/undici#4666.
+trustPolicyExclude:
+  - undici-types
+# Transitive deps must resolve from the registry, not git/tarball sources
+blockExoticSubdeps: true
+
+# Security CVE pins migrated verbatim from the former package.json#pnpm.overrides
+overrides:
+  "diff@<4.0.4": ">=4.0.4"
+  "diff@>=5.0.0 <8.0.3": ">=8.0.3"
+  "axios@1.14.1": "1.14.0"
+  "axios@0.30.4": "0.30.3"
+  "plain-crypto-js@4.2.1": "0.0.0-security"
