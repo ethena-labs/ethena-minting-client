@@ -2,5 +2,5 @@
 * @ethena-labs/product-engineering
 
 # Sensitive repo settings and workflows owned by admins
-.github/workflows/* @deHB6 @FJ-Riveros
-.github/CODEOWNERS @deHB6 @FJ-Riveros
+.github/workflows/* @deHB6 @FJ-Riveros @ElliotWood13
+.github/CODEOWNERS @deHB6 @FJ-Riveros @ElliotWood13
