@@ -1,10 +1,3 @@
-# pnpm-specific settings live here. pnpm v11 no longer reads the package.json
-# "pnpm" field, nor non-auth/registry settings from .npmrc.
-
-# Declare ui/ as a workspace member so its install picks up the supply-chain
-# policies and merged overrides defined below. Without this, pnpm 11 walking
-# up from ui/ finds this workspace but considers ui out-of-tree and does
-# nothing (the prior ui/package.json#pnpm.overrides silently no-op'd in v11).
 packages:
   - ui
 
@@ -85,7 +78,7 @@ overrides:
   "bn.js@<4.12.3": ">=4.12.3"
   "axios@>=1.0.0 <1.15.2": "1.16.0"
   "postcss@<8.5.10": "8.5.10"
-  "hono@<4.12.18": "4.12.18"
+  "hono@<4.12.18": "4.12.25"
   "fast-uri@<=3.1.1": "3.1.2"
 
 # Dependencies permitted to run install/build scripts (all known native tools).
@@ -95,3 +88,6 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   utf-8-validate: true
+minimumReleaseAgeExclude:
+  # Renovate security update: hono@<4.12.18@4.12.25
+  - hono@<4.12.18@4.12.25
