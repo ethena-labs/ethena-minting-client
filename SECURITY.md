@@ -279,30 +279,57 @@ This ensures the patched version is used even if upstream packages haven't yet b
 
 ---
 
-## Axios CRLF Header Injection / IMDSv2 Bypass & NO_PROXY SSRF (#126, #128)
+## Axios advisories (#126, #128, GHSA-gcfj-64vw-6mp9)
 
 ### Overview
-Two related vulnerabilities in Axios (npm) affecting all `>= 1.0.0, < 1.15.0`.
+Multiple axios (npm) advisories remediations are stacked behind one override to `1.18.0`:
+- **#126 / #128** — CRLF header injection chain (IMDSv2 bypass) and `NO_PROXY` hostname normalisation bypass (SSRF); originally affected `>= 1.0.0, < 1.15.0` (patched floor was `1.15.0`).
+- **GHSA-gcfj-64vw-6mp9** — Node HTTP adapter can inherit a polluted `Object.prototype.proxy` after interceptor config cloning; affected `>= 1.15.2, < 1.18.0` (patched floor `1.18.0`).
 
 ### Vulnerability Details
-- **CVE / Issues**: #126 (CRLF header injection chain → IMDSv2 bypass, CVSS 9.9), #128 (NO_PROXY hostname normalisation bypass → SSRF)
-- **Affected versions**: `>= 1.0.0, < 1.15.0`
-- **Patched version**: `1.15.0`
-- **Severity**: Critical (#126), High (#128)
+- **CVE / Issues**: #126 (CRLF header injection chain → IMDSv2 bypass, CVSS 9.9), #128 (NO_PROXY hostname normalisation bypass → SSRF), GHSA-gcfj-64vw-6mp9 (inherited proxy after interceptor cloning)
+- **Affected versions (union currently mitigated)**: `>= 1.0.0, < 1.18.0` (plus the 0.x band handled separately below)
+- **Current patched floor**: `1.18.0`
+- **Severity**: Critical (#126), High (#128 / GHSA-gcfj-64vw-6mp9)
 
 **#126 — CRLF Header Injection:** If any dependency in the stack has a prototype-pollution vulnerability, polluted `Object.prototype` properties are merged into Axios request headers without CRLF sanitisation. A crafted `\r\n` sequence in a header value becomes a request-smuggling payload, enabling AWS IMDSv2 bypass and IAM credential theft.
 
 **#128 — NO_PROXY Bypass:** Axios performs literal string comparison for `NO_PROXY` rules. Hostnames with a trailing dot (`localhost.`) or IPv6 literals (`[::1]`) bypass the check and are incorrectly proxied through any configured HTTP proxy, undermining SSRF protections.
 
+**GHSA-gcfj-64vw-6mp9 — Inherited proxy after interceptor cloning:** Axios hardens merged request config with a null-prototype object, but a common interceptor pattern (`{...config}` / `Object.assign({}, config)`) re-materialises a regular object. The Node HTTP adapter then reads `config.proxy` through the prototype chain, so a polluted `Object.prototype.proxy` can redirect plaintext HTTP requests.
+
 ### Remediation
-- **Mitigation date**: 2026-04-16
+- **Mitigation date**: 2026-04-16 (updated 2026-08-05 for GHSA-gcfj-64vw-6mp9)
 - **Mitigation type**: pnpm override (transitive — blocked from direct parent upgrade)
-- **axios**: Overridden to `1.15.0` via pnpm override in `ui/package.json`
+- **axios**: Overridden to `1.18.0` via root `pnpm-workspace.yaml` (`axios@>=1.0.0 <1.18.0`)
+- **Note**: Prior redirect target `1.16.0` (from an earlier advisory) fell inside the new vulnerable range `>=1.15.2 <1.18.0` and was refreshed to `1.18.0`
 - **Transitive paths fixed**: `@rainbow-me/rainbowkit → axios` and `wagmi → axios`
-- **Validation**: pnpm lockfile regenerated; `axios@1.13.6` no longer present
+- **Validation**: pnpm lockfile regenerated; `axios@1.16.0` no longer present
 
 ### Impact Surface
-`axios` is a runtime dependency of `@rainbow-me/rainbowkit` and `wagmi` (wallet connection stack). These libraries run **client-side in the browser** — a backend SSRF or IMDSv2 attack is not directly applicable in this context. The prototype-pollution gadget chain (CWE-113) remains a theoretical risk if any other browser-side dependency introduces prototype pollution, but no such dependency is currently present.
+`axios` is a runtime dependency of `@rainbow-me/rainbowkit` and `wagmi` (wallet connection stack). These libraries run **client-side in the browser**. GHSA-gcfj-64vw-6mp9 specifically affects the Node HTTP adapter after interceptor config cloning; browser adapters are not the primary impact path. Residual risk remains if any server-side Node axios usage inherits a polluted `Object.prototype.proxy`.
+
+---
+
+## CVE-2026-45409 — idna DoS via incomplete length checks
+
+### Overview
+**CVE-2026-45409 / GHSA-65pc-fj4g-8rjx** — specially crafted inputs to `idna.encode()` (and lesser-used alternate helpers) can bypass the CVE-2024-3651 length guard and consume excessive CPU.
+
+### Vulnerability Details
+- **Affected versions**: `< 3.15`
+- **Patched version**: `>= 3.15`
+- **Severity**: Medium
+- **Previously locked version**: `3.14` (above the incomplete 3.14 partial fix for `encode()`, but still below the 3.15 floor covering alternate entry points)
+
+### Remediation
+- **Mitigation date**: 2026-08-05
+- **Mitigation type**: uv `override-dependencies` (transitive)
+- **idna**: `idna>=3.15` under `[tool.uv] override-dependencies`
+- **Validation**: `uv lock` regenerated; lockfile resolves `idna` to `>=3.15`
+
+### Impact Surface
+Transitive via `requests` / `aiohttp` / `yarl` used by the Python minting client for HTTP calls. Exploitation requires attacker-controlled domain-like strings of extreme length; normal DNS hostnames are capped at 253 characters.
 
 ---
 
@@ -354,7 +381,7 @@ The following overrides are configured in `ui/package.json`:
   "flatted@<3.4.0": ">=3.4.0",
   "ajv@<6.14.0": ">=6.14.0",
   "bn.js@<4.12.3": ">=4.12.3",
-  "axios@>=1.0.0 <1.15.0": "1.15.0"
+  "axios@>=1.0.0 <1.18.0": "1.18.0"
 }
 ```
 
