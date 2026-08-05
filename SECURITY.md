@@ -295,14 +295,37 @@ Two related vulnerabilities in Axios (npm) affecting all `>= 1.0.0, < 1.15.0`.
 **#128 — NO_PROXY Bypass:** Axios performs literal string comparison for `NO_PROXY` rules. Hostnames with a trailing dot (`localhost.`) or IPv6 literals (`[::1]`) bypass the check and are incorrectly proxied through any configured HTTP proxy, undermining SSRF protections.
 
 ### Remediation
-- **Mitigation date**: 2026-04-16
+- **Mitigation date**: 2026-04-16 (updated 2026-08-05 for GHSA-gcfj-64vw-6mp9)
 - **Mitigation type**: pnpm override (transitive — blocked from direct parent upgrade)
-- **axios**: Overridden to `1.15.0` via pnpm override in `ui/package.json`
+- **axios**: Overridden to `1.18.0` via root `pnpm-workspace.yaml` (`axios@>=1.0.0 <1.18.0`)
+- **Note**: Prior redirect target `1.16.0` (from an earlier advisory) fell inside the new vulnerable range `>=1.15.2 <1.18.0` and was refreshed to `1.18.0`
 - **Transitive paths fixed**: `@rainbow-me/rainbowkit → axios` and `wagmi → axios`
-- **Validation**: pnpm lockfile regenerated; `axios@1.13.6` no longer present
+- **Validation**: pnpm lockfile regenerated; `axios@1.16.0` no longer present
 
 ### Impact Surface
-`axios` is a runtime dependency of `@rainbow-me/rainbowkit` and `wagmi` (wallet connection stack). These libraries run **client-side in the browser** — a backend SSRF or IMDSv2 attack is not directly applicable in this context. The prototype-pollution gadget chain (CWE-113) remains a theoretical risk if any other browser-side dependency introduces prototype pollution, but no such dependency is currently present.
+`axios` is a runtime dependency of `@rainbow-me/rainbowkit` and `wagmi` (wallet connection stack). These libraries run **client-side in the browser**. GHSA-gcfj-64vw-6mp9 specifically affects the Node HTTP adapter after interceptor config cloning; browser adapters are not the primary impact path. Residual risk remains if any server-side Node axios usage inherits a polluted `Object.prototype.proxy`.
+
+---
+
+## CVE-2026-45409 — idna DoS via incomplete length checks
+
+### Overview
+**CVE-2026-45409 / GHSA-65pc-fj4g-8rjx** — specially crafted inputs to `idna.encode()` (and lesser-used alternate helpers) can bypass the CVE-2024-3651 length guard and consume excessive CPU.
+
+### Vulnerability Details
+- **Affected versions**: `< 3.15`
+- **Patched version**: `>= 3.15`
+- **Severity**: Medium
+- **Was resolved**: `3.14` (still vulnerable for alternate entry points)
+
+### Remediation
+- **Mitigation date**: 2026-08-05
+- **Mitigation type**: uv `override-dependencies` (transitive)
+- **idna**: `idna>=3.15` under `[tool.uv] override-dependencies`
+- **Validation**: `uv lock` regenerated; lockfile resolves `idna` to `>=3.15`
+
+### Impact Surface
+Transitive via `requests` / `aiohttp` / `yarl` used by the Python minting client for HTTP calls. Exploitation requires attacker-controlled domain-like strings of extreme length; normal DNS hostnames are capped at 253 characters.
 
 ---
 
@@ -354,7 +377,7 @@ The following overrides are configured in `ui/package.json`:
   "flatted@<3.4.0": ">=3.4.0",
   "ajv@<6.14.0": ">=6.14.0",
   "bn.js@<4.12.3": ">=4.12.3",
-  "axios@>=1.0.0 <1.15.0": "1.15.0"
+  "axios@>=1.0.0 <1.18.0": "1.18.0"
 }
 ```
 
