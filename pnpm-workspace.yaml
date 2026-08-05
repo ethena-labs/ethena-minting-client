@@ -50,8 +50,8 @@ overrides:
   "diff@<4.0.4": ">=4.0.4"
   "diff@>=5.0.0 <8.0.3": ">=8.0.3"
   # GHSA-gcfj-64vw-6mp9: prior redirect target 1.16.0 is itself vulnerable
-  # (>=1.15.2 <1.18.0). Keep 0.x pin within its major (0.30.3 is outside
-  # the 0.31.1–0.33.0 affected band for this advisory).
+  # (>=1.15.2 <1.18.0). Keep the 0.30.x pin within that minor line (0.30.3
+  # is outside the 0.31.1–0.33.0 affected band for this advisory).
   "axios@>=1.0.0 <1.18.0": "1.18.0"
   "axios@0.30.4": "0.30.3"
   "plain-crypto-js@4.2.1": "0.0.0-security"

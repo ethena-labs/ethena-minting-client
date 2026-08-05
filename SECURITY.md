@@ -279,20 +279,24 @@ This ensures the patched version is used even if upstream packages haven't yet b
 
 ---
 
-## Axios CRLF Header Injection / IMDSv2 Bypass & NO_PROXY SSRF (#126, #128)
+## Axios advisories (#126, #128, GHSA-gcfj-64vw-6mp9)
 
 ### Overview
-Two related vulnerabilities in Axios (npm) affecting all `>= 1.0.0, < 1.15.0`.
+Multiple axios (npm) advisories remediations are stacked behind one override to `1.18.0`:
+- **#126 / #128** — CRLF header injection chain (IMDSv2 bypass) and `NO_PROXY` hostname normalisation bypass (SSRF); originally affected `>= 1.0.0, < 1.15.0` (patched floor was `1.15.0`).
+- **GHSA-gcfj-64vw-6mp9** — Node HTTP adapter can inherit a polluted `Object.prototype.proxy` after interceptor config cloning; affected `>= 1.15.2, < 1.18.0` (patched floor `1.18.0`).
 
 ### Vulnerability Details
-- **CVE / Issues**: #126 (CRLF header injection chain → IMDSv2 bypass, CVSS 9.9), #128 (NO_PROXY hostname normalisation bypass → SSRF)
-- **Affected versions**: `>= 1.0.0, < 1.15.0`
-- **Patched version**: `1.15.0`
-- **Severity**: Critical (#126), High (#128)
+- **CVE / Issues**: #126 (CRLF header injection chain → IMDSv2 bypass, CVSS 9.9), #128 (NO_PROXY hostname normalisation bypass → SSRF), GHSA-gcfj-64vw-6mp9 (inherited proxy after interceptor cloning)
+- **Affected versions (union currently mitigated)**: `>= 1.0.0, < 1.18.0` (plus the 0.x band handled separately below)
+- **Current patched floor**: `1.18.0`
+- **Severity**: Critical (#126), High (#128 / GHSA-gcfj-64vw-6mp9)
 
 **#126 — CRLF Header Injection:** If any dependency in the stack has a prototype-pollution vulnerability, polluted `Object.prototype` properties are merged into Axios request headers without CRLF sanitisation. A crafted `\r\n` sequence in a header value becomes a request-smuggling payload, enabling AWS IMDSv2 bypass and IAM credential theft.
 
 **#128 — NO_PROXY Bypass:** Axios performs literal string comparison for `NO_PROXY` rules. Hostnames with a trailing dot (`localhost.`) or IPv6 literals (`[::1]`) bypass the check and are incorrectly proxied through any configured HTTP proxy, undermining SSRF protections.
+
+**GHSA-gcfj-64vw-6mp9 — Inherited proxy after interceptor cloning:** Axios hardens merged request config with a null-prototype object, but a common interceptor pattern (`{...config}` / `Object.assign({}, config)`) re-materialises a regular object. The Node HTTP adapter then reads `config.proxy` through the prototype chain, so a polluted `Object.prototype.proxy` can redirect plaintext HTTP requests.
 
 ### Remediation
 - **Mitigation date**: 2026-04-16 (updated 2026-08-05 for GHSA-gcfj-64vw-6mp9)
@@ -316,7 +320,7 @@ Two related vulnerabilities in Axios (npm) affecting all `>= 1.0.0, < 1.15.0`.
 - **Affected versions**: `< 3.15`
 - **Patched version**: `>= 3.15`
 - **Severity**: Medium
-- **Was resolved**: `3.14` (still vulnerable for alternate entry points)
+- **Previously locked version**: `3.14` (above the incomplete 3.14 partial fix for `encode()`, but still below the 3.15 floor covering alternate entry points)
 
 ### Remediation
 - **Mitigation date**: 2026-08-05
