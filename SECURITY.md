@@ -397,6 +397,16 @@ The following overrides are configured in root `package.json`:
 
 ---
 
+
+## CVE-2026-13149 - brace-expansion DoS
+
+- **Date:** `2026-08-07`
+- **Package:** `brace-expansion` (npm, transitive)
+- **Vulnerable range:** `<1.1.16` | `>=2.0.0 <2.1.2` | `>=3.0.0 <5.0.7`
+- **Fixed/blocked target:** `1.1.16` / `2.1.2` / `5.0.7` via pnpm overrides
+- **Mitigation type:** override (fail-closed); prior lockfile had `1.1.14` and `5.0.6`
+- **Validation status:** `pnpm install --lockfile-only`
+
 ## Installation
 
 After these updates, run:
