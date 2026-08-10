@@ -12,12 +12,13 @@ packages:
 # Refuse to install package versions younger than 10 days
 minimumReleaseAge: 14400
 minimumReleaseAgeExclude:
-  # TEMPORARY (~remove after 2026-08-20): package-name excludes are required —
-  # version-scoped excludes alone do not bypass minimumReleaseAge for these
-  # security pins on pnpm. Revisit once patched releases are >10 days old.
-  - brace-expansion
-  - fast-uri
-  - js-yaml
+  # TEMPORARY excludes (~remove once these patched versions clear the 10-day age
+  # gate, ~2026-08-20): version-scoped so ONLY these exact security-patched
+  # versions bypass minimumReleaseAge — every other version still gets the age
+  # check. The `overrides` below are the permanent pins; only these are temporary.
+  - brace-expansion@1.1.18 || 2.1.4 || 3.0.6 || 5.0.9
+  - fast-uri@3.1.5
+  - js-yaml@3.15.1 || 4.3.1 || 5.2.2
 # Fail (don't silently downgrade) if a package's publisher trust level drops
 trustPolicy: no-downgrade
 # Known-benign provenance downgrades, vetted and exempted from no-downgrade.
