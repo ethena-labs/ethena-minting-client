@@ -12,6 +12,9 @@ packages:
 # Refuse to install package versions younger than 10 days
 minimumReleaseAge: 14400
 minimumReleaseAgeExclude:
+  # TEMPORARY (~remove after 2026-08-20): package-name excludes are required —
+  # version-scoped excludes alone do not bypass minimumReleaseAge for these
+  # security pins on pnpm. Revisit once patched releases are >10 days old.
   - brace-expansion
   - fast-uri
   - js-yaml
@@ -102,8 +105,10 @@ overrides:
   # CVE-2026-12143: form-data predictable multipart boundary
   "form-data@>=4.0.0 <4.0.6": ">=4.0.6 <5.0.0"
 
+  # CVE-2026-69152 patched lines: 1.1.18 / 2.1.4 / 3.0.6 / 5.0.9
   "brace-expansion@<1.1.18": "1.1.18"
   "brace-expansion@>=2.0.0 <2.1.4": "2.1.4"
+  "brace-expansion@>=3.0.0 <3.0.6": "3.0.6"
   "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
   "postcss@<8.5.18": "8.5.18"
   "fast-uri@>=3.0.0 <3.1.5": "3.1.5"
