@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-07-31T09:16:07.045381Z"
+exclude-newer = "2026-07-31T11:47:33.76138Z"
 exclude-newer-span = "P10D"
 
 [manifest]
@@ -633,7 +633,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiohttp", specifier = "==3.13.4" },
+    { name = "aiohttp", specifier = ">=3.14.3" },
     { name = "hexbytes", specifier = "==1.3.1" },
     { name = "python-dotenv", specifier = "==1.2.2" },
     { name = "requests", specifier = "==2.33.0" },
