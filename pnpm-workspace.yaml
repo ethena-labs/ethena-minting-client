@@ -40,6 +40,10 @@ blockExoticSubdeps: true
 # package.json#pnpm field, so the ui/-local overrides would silently no-op
 # without being moved here — pnpm walking up from ui/ now finds these.
 overrides:
+  # CVE-2026-41907 / GHSA-w5hq-g745-h8pq: uuid buffer bounds (11.x only; 8/9/10 deferred)
+  "uuid@>=11.0.0 <11.1.1": "11.1.1"
+  # GHSA-f88m-g3jw-g9cj: sharp libvips inherited CVEs (high)
+  "sharp@<0.35.0": "0.35.3"
   # Force @noble/curves to a version that HAS npm provenance attestation, so
   # trustPolicy: no-downgrade is preserved (instead of excluding noble crypto
   # libs which would weaken the gate on security-critical packages). Provenance
