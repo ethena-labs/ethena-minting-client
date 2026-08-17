@@ -19,6 +19,14 @@ minimumReleaseAgeExclude:
   - brace-expansion@1.1.18 || 2.1.4 || 3.0.6 || 5.0.9
   - fast-uri@3.1.5
   - js-yaml@3.15.1 || 4.3.1 || 5.2.2
+  - nanoid@3.3.18 || 5.1.16
+  - ip-address@10.3.1
+  - socket.io-parser@4.2.7
+  - postcss@8.5.23
+  - next@15.5.21 || 16.2.11
+  - undici@6.28.0 || 8.9.0
+  - react-router@7.18.2
+  - react-router-dom@7.18.2
 # Fail (don't silently downgrade) if a package's publisher trust level drops
 trustPolicy: no-downgrade
 # Known-benign provenance downgrades, vetted and exempted from no-downgrade.
@@ -40,6 +48,10 @@ blockExoticSubdeps: true
 # package.json#pnpm field, so the ui/-local overrides would silently no-op
 # without being moved here — pnpm walking up from ui/ now finds these.
 overrides:
+  "socket.io-parser@>=4.0.0 <4.2.7": "4.2.7"
+  "ip-address@<10.3.1": "10.3.1"
+  "nanoid@>=4.0.0 <5.1.16": "5.1.16"
+  "nanoid@<3.3.18": "3.3.18"
   # CVE-2026-41907 / GHSA-w5hq-g745-h8pq: uuid buffer bounds (11.x only; 8/9/10 deferred)
   "uuid@>=11.0.0 <11.1.1": "11.1.1"
   # GHSA-f88m-g3jw-g9cj: sharp libvips inherited CVEs (high)
@@ -79,10 +91,10 @@ overrides:
   "next@>=15.2.0 <15.2.6": ">=15.2.6"
   "next@>=15.3.0 <15.3.6": ">=15.3.6"
   "next@>=15.4.0 <15.4.10": ">=15.4.10"
-  "next@>=15.5.0 <15.5.18": ">=15.5.18"
+  "next@>=15.5.0 <15.5.21": "15.5.21"
   "next@>=16.0.0 <16.0.11": ">=16.0.11"
   "next@>=16.1.0 <16.1.5": ">=16.1.5"
-  "next@>=16.2.0 <16.2.6": ">=16.2.6"
+  "next@>=16.2.0 <16.2.11": ">=16.2.11"
   "glob@>=10.2.0 <10.5.0": ">=10.5.0"
   "@babel/runtime@<7.26.10": ">=7.26.10"
   "@metamask/sdk-communication-layer@>=0.16.0 <=0.33.0": ">=0.33.1"
@@ -115,7 +127,7 @@ overrides:
   "brace-expansion@>=2.0.0 <2.1.4": "2.1.4"
   "brace-expansion@>=3.0.0 <3.0.6": "3.0.6"
   "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
-  "postcss@<8.5.18": "8.5.18"
+  "postcss@<8.5.23": "8.5.23"
   "fast-uri@>=3.0.0 <3.1.5": "3.1.5"
   "js-yaml@>=3.0.0 <3.15.1": "3.15.1"
   "js-yaml@>=4.0.0 <4.3.1": "4.3.1"
