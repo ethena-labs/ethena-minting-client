@@ -416,14 +416,13 @@ The following overrides are configured in root `package.json`:
 - **Mitigation type:** override (fail-closed); prior lockfile had `0.34.5`
 - **Validation status:** `pnpm install --lockfile-only`
 
-## CVE-2026-41907 - uuid buffer bounds (11.x only)
+## CVE-2026-41907 - uuid buffer bounds
 
-- **Date:** `2026-08-14`
+- **Date:** `2026-08-27`
 - **Package:** `uuid` (npm, transitive)
-- **Vulnerable range (patched here):** `>=11.0.0 <11.1.1`
-- **Fixed/blocked target:** `11.1.1` via pnpm override `uuid@>=11.0.0 <11.1.1`
-- **Mitigation type:** override (fail-closed) for 11.x only
-- **MAJOR BUMP DEFERRED:** residual `uuid@8` / `9` have no same-major patch; forcing `11.1.1` is a major jump (wallet/connector chains). Residual Dependabot alert accepted until parents can upgrade.
+- **Vulnerable range:** `<11.1.1`
+- **Fixed/blocked target:** `11.1.1` via pnpm override `uuid@<11.1.1`
+- **Mitigation type:** override (fail-closed). **MAJOR BUMP APPLIED** for residual `uuid@8` / `9` (MetaMask SDK/utils) onto 11.1.1. uuid 12+ not used (drops CJS).
 - **Validation status:** `pnpm install --lockfile-only`
 
 ## Installation
