@@ -1,10 +1,3 @@
-# pnpm-specific settings live here. pnpm v11 no longer reads the package.json
-# "pnpm" field, nor non-auth/registry settings from .npmrc.
-
-# Declare ui/ as a workspace member so its install picks up the supply-chain
-# policies and merged overrides defined below. Without this, pnpm 11 walking
-# up from ui/ finds this workspace but considers ui out-of-tree and does
-# nothing (the prior ui/package.json#pnpm.overrides silently no-op'd in v11).
 packages:
   - ui
 
@@ -17,16 +10,21 @@ minimumReleaseAgeExclude:
   # versions bypass minimumReleaseAge — every other version still gets the age
   # check. The `overrides` below are the permanent pins; only these are temporary.
   - brace-expansion@1.1.18 || 2.1.4 || 3.0.6 || 5.0.9
-  - fast-uri@3.1.5
-  - js-yaml@3.15.1 || 4.3.1 || 5.2.2
+  # Renovate security update: fast-uri@3.1.6
+  - fast-uri@3.1.5 || 3.1.6
+  # Renovate security update: js-yaml@4.3.2
+  - js-yaml@3.15.1 || 4.3.1 || 5.2.2 || 4.3.2
   - nanoid@3.3.18 || 5.1.16
   - ip-address@10.3.1
   - socket.io-parser@4.2.7
   - postcss@8.5.23
-  - next@15.5.21 || 16.2.11
+  # Renovate security update: next@16.3.3
+  - next@15.5.21 || 16.2.11 || 16.3.3
   - undici@6.28.0 || 8.9.0
   - react-router@7.18.2
   - react-router-dom@7.18.2
+  # Renovate security update: sharp@0.35.4
+  - sharp@0.35.4
 # Fail (don't silently downgrade) if a package's publisher trust level drops
 trustPolicy: no-downgrade
 # Known-benign provenance downgrades, vetted and exempted from no-downgrade.
@@ -55,7 +53,7 @@ overrides:
   # CVE-2026-41907 / GHSA-w5hq-g745-h8pq: uuid buffer bounds (8/9/10/11.0 → 11.1.1; MAJOR for prior 8/9/10)
   "uuid@<11.1.1": "11.1.1"
   # GHSA-f88m-g3jw-g9cj: sharp libvips inherited CVEs (high)
-  "sharp@<0.35.0": "0.35.3"
+  "sharp@<0.35.0": "0.35.4"
   # Force @noble/curves to a version that HAS npm provenance attestation, so
   # trustPolicy: no-downgrade is preserved (instead of excluding noble crypto
   # libs which would weaken the gate on security-critical packages). Provenance
@@ -114,7 +112,7 @@ overrides:
   "ajv@<6.14.0": ">=6.14.0"
   "bn.js@<4.12.3": ">=4.12.3"
 
-  "hono@<4.12.25": ">=4.12.25 <5.0.0"  # CVE-2026-54290 (was <4.12.18 -> 4.12.18, now itself vulnerable)
+  "hono@<4.12.25": ">=4.12.25 <5.0.0" # CVE-2026-54290 (was <4.12.18 -> 4.12.18, now itself vulnerable)
 
   # CVE-2026-48779: ws DoS via oversized headers. Only the 8.x line is
   # affected (8.18.0/8.20.1 in-tree); ws@7.5.11 is already patched, leave it.
@@ -128,9 +126,9 @@ overrides:
   "brace-expansion@>=3.0.0 <3.0.6": "3.0.6"
   "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
   "postcss@<8.5.23": "8.5.23"
-  "fast-uri@>=3.0.0 <3.1.5": "3.1.5"
+  "fast-uri@>=3.0.0 <3.1.5": "3.1.6"
   "js-yaml@>=3.0.0 <3.15.1": "3.15.1"
-  "js-yaml@>=4.0.0 <4.3.1": "4.3.1"
+  "js-yaml@>=4.0.0 <4.3.1": "4.3.2"
   "js-yaml@>=5.0.0 <=5.2.1": "5.2.2"
 # Dependencies permitted to run install/build scripts (all known native tools).
 allowBuilds:
