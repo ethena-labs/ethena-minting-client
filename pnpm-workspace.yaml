@@ -10,8 +10,8 @@ minimumReleaseAgeExclude:
   # versions bypass minimumReleaseAge — every other version still gets the age
   # check. The `overrides` below are the permanent pins; only these are temporary.
   - brace-expansion@1.1.18 || 2.1.4 || 3.0.6 || 5.0.9
-  # Renovate security update: fast-uri@3.1.6
-  - fast-uri@3.1.5 || 3.1.6
+  # Renovate security update: fast-uri@3.1.6 || 3.1.7
+  - fast-uri@3.1.5 || 3.1.6 || 3.1.7
   # Renovate security update: js-yaml@4.3.2
   - js-yaml@3.15.1 || 4.3.1 || 5.2.2 || 4.3.2
   - nanoid@3.3.18 || 5.1.16
@@ -126,7 +126,7 @@ overrides:
   "brace-expansion@>=3.0.0 <3.0.6": "3.0.6"
   "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
   "postcss@<8.5.23": "8.5.23"
-  "fast-uri@>=3.0.0 <3.1.5": "3.1.6"
+  "fast-uri@>=3.0.0 <3.1.5": "3.1.7"
   "js-yaml@>=3.0.0 <3.15.1": "3.15.1"
   "js-yaml@>=4.0.0 <4.3.1": "4.3.2"
   "js-yaml@>=5.0.0 <=5.2.1": "5.2.2"
