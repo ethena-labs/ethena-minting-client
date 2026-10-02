@@ -19,7 +19,18 @@ minimumReleaseAgeExclude:
   - socket.io-parser@4.2.7
   - postcss@8.5.23
   # Renovate security update: next@16.3.3
-  - next@15.5.21 || 16.2.11 || 16.3.3
+  - next@15.5.21 || 16.2.11 || 16.3.3 || 16.3.6
+  # GHSA-vcvr-r3jv-pc5j (critical): next@16.3.6 and its lockstep @next/* packages
+  # (published 2026-09-22) are inside the 10-day gate until ~2026-10-02T16:20Z.
+  - '@next/env@16.3.6'
+  - '@next/swc-darwin-arm64@16.3.6'
+  - '@next/swc-darwin-x64@16.3.6'
+  - '@next/swc-linux-arm64-gnu@16.3.6'
+  - '@next/swc-linux-arm64-musl@16.3.6'
+  - '@next/swc-linux-x64-gnu@16.3.6'
+  - '@next/swc-linux-x64-musl@16.3.6'
+  - '@next/swc-win32-arm64-msvc@16.3.6'
+  - '@next/swc-win32-x64-msvc@16.3.6'
   - undici@6.28.0 || 8.9.0
   - react-router@7.18.2
   - react-router-dom@7.18.2
@@ -54,6 +65,8 @@ overrides:
   "uuid@<11.1.1": "11.1.1"
   # GHSA-f88m-g3jw-g9cj: sharp libvips inherited CVEs (high)
   "sharp@<0.35.0": "0.35.4"
+  # GHSA-rgj7-g3m4-5g8c: sharp (high)
+  "sharp@>=0.35.0 <0.35.4": "0.35.4"
   # Force @noble/curves to a version that HAS npm provenance attestation, so
   # trustPolicy: no-downgrade is preserved (instead of excluding noble crypto
   # libs which would weaken the gate on security-critical packages). Provenance
@@ -74,7 +87,8 @@ overrides:
   # GHSA-gcfj-64vw-6mp9: prior redirect target 1.16.0 is itself vulnerable
   # (>=1.15.2 <1.18.0). Keep the 0.30.x pin within that minor line (0.30.3
   # is outside the 0.31.1–0.33.0 affected band for this advisory).
-  "axios@>=1.0.0 <1.18.0": "1.18.0"
+  # GHSA-j8rh-479h-cp32, GHSA-m8m8-qj5v-23w3, GHSA-r4gj-5m52-g5wh, GHSA-c29m-xwm3-cm6r et al. (high): fixed in 1.20.0
+  "axios@>=1.0.0 <1.20.0": "1.20.0"
   "axios@0.30.4": "0.30.3"
   "plain-crypto-js@4.2.1": "0.0.0-security"
   # Migrated from ui/package.json#pnpm.overrides
@@ -112,7 +126,9 @@ overrides:
   "ajv@<6.14.0": ">=6.14.0"
   "bn.js@<4.12.3": ">=4.12.3"
 
-  "hono@<4.12.25": ">=4.12.25 <5.0.0" # CVE-2026-54290 (was <4.12.18 -> 4.12.18, now itself vulnerable)
+  # GHSA-8j4g-w8fx-2239, GHSA-54fx-42gc-7vw4, GHSA-79qm-7rj5-m7r9, GHSA-f23p-vx2j-j53r,
+  # GHSA-g6gw-c38x-mqfc, GHSA-crvj-82cr-hjcx, GHSA-gqvv-2mrq-wpjv, GHSA-hxh3-vqpv-xpqv
+  "hono@>=4.0.0 <4.13.7": "4.13.8"
 
   # CVE-2026-48779: ws DoS via oversized headers. Only the 8.x line is
   # affected (8.18.0/8.20.1 in-tree); ws@7.5.11 is already patched, leave it.
@@ -120,18 +136,32 @@ overrides:
   # CVE-2026-12143: form-data predictable multipart boundary
   "form-data@>=4.0.0 <4.0.6": ">=4.0.6 <5.0.0"
 
-  # CVE-2026-69152 patched lines: 1.1.18 / 2.1.4 / 3.0.6 / 5.0.9
-  "brace-expansion@<1.1.18": "1.1.18"
-  "brace-expansion@>=2.0.0 <2.1.4": "2.1.4"
-  "brace-expansion@>=3.0.0 <3.0.6": "3.0.6"
-  "brace-expansion@>=4.0.0 <5.0.9": "5.0.9"
+  # CVE-2026-69152 + GHSA-6j4f-fj2g-mc7p / GHSA-qhr7-859c-m2p7 (high), GHSA-q2hr-2g5m-vwhr
+  # patched lines: 1.1.21 / 2.1.7 / 3.0.9 / 5.0.12
+  "brace-expansion@>=1.0.0 <1.1.21": "1.1.21"
+  "brace-expansion@>=2.0.0 <2.1.7": "2.1.7"
+  "brace-expansion@>=3.0.0 <3.0.9": "3.0.9"
+  "brace-expansion@>=4.0.0 <5.0.12": "5.0.12"
   "postcss@<8.5.23": "8.5.23"
-  "fast-uri@>=3.0.0 <3.1.5": "3.1.6"
+  # GHSA-58mr-gqgx-xq4g / GHSA-qw65-cvwx-89v3 (high), GHSA-hrr3-gc8f-f4qj
+  "fast-uri@>=3.0.0 <3.1.8": "3.1.8"
   "js-yaml@>=3.0.0 <3.15.1": "3.15.1"
   "js-yaml@>=4.0.0 <4.3.1": "4.3.2"
   "js-yaml@>=5.0.0 <=5.2.1": "5.2.2"
+  # GHSA-73wf-gq98-2v4g / GHSA-c83g-rgw3-j3cx (high)
+  "browserslist@>=4.0.0 <=4.28.6": "4.29.0"
+  # GHSA-w5vr-8v7q-w6rv
+  "baseline-browser-mapping@>=2.0.0 <2.11.0": "2.11.25"
+  # GHSA-w9m9-85wc-3x92
+  "postcss-selector-parser@>=6.1.0 <6.1.3": "6.1.4"
+  # GHSA-vcc3-ghjq-m6fr: decode-uri-component's only fix (0.5.0) is ESM-only and is
+  # require()d by CJS query-string@7. wagmi 2.x pins ethereum-provider 2.21.1, whose
+  # @walletconnect/utils 2.21.x pulls query-string; utils >=2.21.9 dropped it.
+  "@walletconnect/ethereum-provider@>=2.0.0 <2.21.9": "2.23.10"
 # Dependencies permitted to run install/build scripts (all known native tools).
 allowBuilds:
+  # postinstall is only a local version-mismatch console check (no build output); deny it
+  "@reown/appkit": false
   bufferutil: true
   keccak: true
   sharp: true
