@@ -64,9 +64,9 @@ overrides:
   # CVE-2026-41907 / GHSA-w5hq-g745-h8pq: uuid buffer bounds (8/9/10/11.0 → 11.1.1; MAJOR for prior 8/9/10)
   "uuid@<11.1.1": "11.1.1"
   # GHSA-f88m-g3jw-g9cj: sharp libvips inherited CVEs (high)
-  "sharp@<0.35.0": "0.35.4"
-  # GHSA-rgj7-g3m4-5g8c: sharp (high)
-  "sharp@>=0.35.0 <0.35.4": "0.35.4"
+  "sharp@<0.35.0": "0.35.5"
+  # GHSA-rgj7-g3m4-5g8c, GHSA-wq5f-xc86-pv6w: sharp (high)
+  "sharp@>=0.35.0 <0.35.5": "0.35.5"
   # Force @noble/curves to a version that HAS npm provenance attestation, so
   # trustPolicy: no-downgrade is preserved (instead of excluding noble crypto
   # libs which would weaken the gate on security-critical packages). Provenance
@@ -128,7 +128,8 @@ overrides:
 
   # GHSA-8j4g-w8fx-2239, GHSA-54fx-42gc-7vw4, GHSA-79qm-7rj5-m7r9, GHSA-f23p-vx2j-j53r,
   # GHSA-g6gw-c38x-mqfc, GHSA-crvj-82cr-hjcx, GHSA-gqvv-2mrq-wpjv, GHSA-hxh3-vqpv-xpqv
-  "hono@>=4.0.0 <4.13.7": "4.13.8"
+  # GHSA-5r4p-p66f-jhc7: serveStatic double-decode middleware bypass
+  "hono@>=4.0.0 <4.13.11": "4.13.11"
 
   # CVE-2026-48779: ws DoS via oversized headers. Only the 8.x line is
   # affected (8.18.0/8.20.1 in-tree); ws@7.5.11 is already patched, leave it.
@@ -143,6 +144,10 @@ overrides:
   "brace-expansion@>=3.0.0 <3.0.9": "3.0.9"
   "brace-expansion@>=4.0.0 <5.0.12": "5.0.12"
   "postcss@<8.5.23": "8.5.23"
+  # GHSA-68fv-2mgg-jv7q (high): source-map-js event-loop DoS
+  "source-map-js@>=1.0.0 <1.2.2": "1.2.2"
+  # GHSA-q3jh-wrc6-jgq8 / GHSA-8r9p-f939-6h3c (high): follow-redirects credential stripping bypass
+  "follow-redirects@>=1.16.0 <1.16.1": "1.16.1"
   # GHSA-58mr-gqgx-xq4g / GHSA-qw65-cvwx-89v3 (high), GHSA-hrr3-gc8f-f4qj
   "fast-uri@>=3.0.0 <3.1.8": "3.1.8"
   "js-yaml@>=3.0.0 <3.15.1": "3.15.1"
