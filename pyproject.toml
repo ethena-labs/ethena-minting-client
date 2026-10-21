@@ -17,6 +17,8 @@ dependencies = [
 
 [tool.uv]
 exclude-newer = "10 days"
+# certifi exempt from cooldown for the emSign CA compromise patch; remove after 2026-11-01
+exclude-newer-package = { certifi = "2026-10-21T00:00:00Z" }
 dev-dependencies = [
     "mypy",
     "types-requests",
