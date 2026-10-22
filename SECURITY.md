@@ -425,6 +425,20 @@ The following overrides are configured in root `package.json`:
 - **Mitigation type:** override (fail-closed). **MAJOR BUMP APPLIED** for residual `uuid@8` / `9` (MetaMask SDK/utils) onto 11.1.1. uuid 12+ not used (drops CJS).
 - **Validation status:** `pnpm install --lockfile-only`
 
+## 2026-10-21 Dependabot sweep
+
+- **Date:** `2026-10-21`
+- **next** (npm, direct in `ui/`): `>=16.0.0 <16.3.8` (GHSA-cjq9-62q9-8jv4 high, GHSA-3w37-wq28-93x7, GHSA-mcj8-r9mp-w47p, GHSA-f87g-xv8r-7p7x, GHSA-4jqv-mc3x-m676, GHSA-39w2-rjm5-chcv) → `16.3.8`. Mitigation: direct upgrade in `ui/package.json`.
+- **sharp** (npm, transitive via Next.js): `<0.35.5` (GHSA-wq5f-xc86-pv6w, high) → `0.35.5`. Mitigation: override targets refreshed (`sharp@<0.35.0` and `sharp@>=0.35.0 <0.35.5` → `0.35.5`); prior target `0.35.4` was itself vulnerable.
+- **hono** (npm, transitive via `porto`): `>=4.12.4 <4.13.11` (GHSA-5r4p-p66f-jhc7) → `4.13.11`. Mitigation: override refreshed (`hono@>=4.0.0 <4.13.11`); prior target `4.13.8` was itself vulnerable.
+- **follow-redirects** (npm, transitive via `axios`): `>=1.16.0 <1.16.1` (GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c, high) → `1.16.1`. Mitigation: override.
+- **source-map-js** (npm, transitive via `postcss`): `>=1.0.0 <1.2.2` (GHSA-68fv-2mgg-jv7q, high) → `1.2.2`. Mitigation: override.
+- **aiohttp** (pip, direct): `<=3.14.3` (GHSA-2g87-pp6c-29x5, GHSA-5wr8-gcqf-gqf3 high; GHSA-494j-54xm-rwp3 low) → `>=3.14.4` (locks `3.14.5`, which requires `yarl>=1.25.1`). Mitigation: direct floor in `pyproject.toml` / `requirements.txt` + `override-dependencies`.
+- **multidict** (pip, transitive via `aiohttp`/`yarl`): `>=6.7.0 <=6.9.0` (GHSA-54p9-h82j-f925) → `6.9.1`. Mitigation: `override-dependencies` `multidict>=6.9.1,<7` (capped to avoid an unrequested 7.x major).
+- **MAJOR BUMP DEFERRED — postcss-selector-parser** (GHSA-rj75-hqrm-r3gf, `<7.1.6`): only fix is `7.1.6`; in-tree `6.1.4` is required by `tailwindcss@3` (`^6.x`). Forcing 7.x is an undeclared major on the Tailwind 3 build toolchain (build-time only, not shipped to the browser). Revisit with a Tailwind 4 migration or a 6.x backport.
+- **No upstream patch — braces** (GHSA-vfj7-8cjw-p6xm, `<=3.0.3`): build-time only (via `micromatch`/`chokidar`); left open.
+- **Validation status:** `pnpm install --lockfile-only` + `pnpm install --frozen-lockfile`; `uv lock --upgrade-package aiohttp --upgrade-package multidict`; `ui` `tsc --noEmit` and `next build` pass.
+
 ## Installation
 
 After these updates, run:
