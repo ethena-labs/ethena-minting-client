@@ -36,6 +36,8 @@ minimumReleaseAgeExclude:
   - react-router-dom@7.18.2
   # Renovate security update: sharp@0.35.4
   - sharp@0.35.4
+  # Renovate security update: postcss-selector-parser@7.1.6
+  - postcss-selector-parser@7.1.6
 # Fail (don't silently downgrade) if a package's publisher trust level drops
 trustPolicy: no-downgrade
 # Known-benign provenance downgrades, vetted and exempted from no-downgrade.
@@ -158,7 +160,7 @@ overrides:
   # GHSA-w5vr-8v7q-w6rv
   "baseline-browser-mapping@>=2.0.0 <2.11.0": "2.11.25"
   # GHSA-w9m9-85wc-3x92
-  "postcss-selector-parser@>=6.1.0 <6.1.3": "6.1.4"
+  "postcss-selector-parser@>=6.1.0 <6.1.3": "7.1.6"
   # GHSA-vcc3-ghjq-m6fr: decode-uri-component's only fix (0.5.0) is ESM-only and is
   # require()d by CJS query-string@7. wagmi 2.x pins ethereum-provider 2.21.1, whose
   # @walletconnect/utils 2.21.x pulls query-string; utils >=2.21.9 dropped it.
