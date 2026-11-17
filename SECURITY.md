@@ -439,6 +439,18 @@ The following overrides are configured in root `package.json`:
 - **No upstream patch — braces** (GHSA-vfj7-8cjw-p6xm, `<=3.0.3`): build-time only (via `micromatch`/`chokidar`); left open.
 - **Validation status:** `pnpm install --lockfile-only` + `pnpm install --frozen-lockfile`; `uv lock --upgrade-package aiohttp --upgrade-package multidict`; `ui` `tsc --noEmit` and `next build` pass.
 
+## 2026-11-12 Dependabot sweep
+
+- **Date:** `2026-11-12`
+- **follow-redirects** (npm, transitive via `axios`): `>=1.16.0 <=1.16.1` (GHSA-mrwp-f3q8-3g9p, high) → `1.16.2`. Mitigation: override key widened to `follow-redirects@>=1.16.0 <1.16.2`; prior target `1.16.1` was itself vulnerable.
+- **fast-uri** (npm, transitive via `ajv@8`/`eslint`): `>=3.0.0 <3.1.9` (GHSA-wjr9-j795-jxcr, GHSA-333x-w4r6-6crp, GHSA-w74x-v6f9-j3xg, GHSA-xhq7-xmqj-769h) → `3.1.9`. Mitigation: override key widened to `fast-uri@>=3.0.0 <3.1.9`; prior target `3.1.8` was itself vulnerable.
+- **postcss-selector-parser** (npm, transitive via `tailwindcss@3`): `<6.1.5` (GHSA-rj75-hqrm-r3gf) → `6.1.5`. Mitigation: override `postcss-selector-parser@>=6.0.0 <6.1.5` → `6.1.5`. The 6.x backport closes the 2026-10-21 MAJOR BUMP DEFERRED item without a 7.x move.
+- **zod** (npm, transitive via `viem`/`abitype`/`porto`): `<4.6.6` (GHSA-mrhx-c7xc-m3w5, high) → `4.6.6` for the 4.x line. Mitigation: override `zod@>=4.0.0 <4.6.6` → `4.6.6`.
+- **MAJOR BUMP DEFERRED — zod 3.x**: `zod@3.22.4` (`@reown/appkit-wallet`, exact pin) and `zod@3.25.76` (`@coinbase/cdp-sdk`, `^3`) remain. No 3.x fix exists; forcing 4.x onto these consumers is an undeclared 3→4 major in the wallet-connection stack (`ui/` only; the root mint script does not use zod). Revisit when RainbowKit/Reown and the Coinbase SDK move to zod 4.
+- **setuptools** (pip, direct): `>=38.2.2 <84.1.0` (GHSA-xmj3-9gf7-h52w, low) → `84.1.0`. Mitigation: direct pin bump in `pyproject.toml` / `requirements.txt`. ⚠️ MAJOR (83 → 84): 84.0 changes are confined to the distutils C-compiler internals; nothing in this repo imports setuptools at runtime.
+- **No upstream patch — deepmerge** (GHSA-gcqx-w48m-w2h4, `>=4.2.0 <=4.3.1`): transitive via `@vanilla-extract/css` (RainbowKit); left open.
+- **Validation status:** `pnpm install --lockfile-only` + `pnpm install --frozen-lockfile`; `uv lock` (only setuptools moved); `ui` `next build` passes; Python deps import cleanly under 3.12.
+
 ## Installation
 
 After these updates, run:
