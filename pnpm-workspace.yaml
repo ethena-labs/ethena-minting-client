@@ -18,8 +18,8 @@ minimumReleaseAgeExclude:
   - ip-address@10.3.1
   - socket.io-parser@4.2.7
   - postcss@8.5.23
-  # Renovate security update: next@16.3.3
-  - next@15.5.21 || 16.2.11 || 16.3.3 || 16.3.6
+  # Renovate security update: next@16.3.3 || 16.4.5
+  - next@15.5.21 || 16.2.11 || 16.3.3 || 16.3.6 || 16.4.5
   # GHSA-vcvr-r3jv-pc5j (critical): next@16.3.6 and its lockstep @next/* packages
   # (published 2026-09-22) are inside the 10-day gate until ~2026-10-02T16:20Z.
   - '@next/env@16.3.6'
@@ -36,6 +36,8 @@ minimumReleaseAgeExclude:
   - react-router-dom@7.18.2
   # Renovate security update: sharp@0.35.4
   - sharp@0.35.4
+  # Renovate security update: hono@4.13.16
+  - hono@4.13.16
 # Fail (don't silently downgrade) if a package's publisher trust level drops
 trustPolicy: no-downgrade
 # Known-benign provenance downgrades, vetted and exempted from no-downgrade.
@@ -129,7 +131,7 @@ overrides:
   # GHSA-8j4g-w8fx-2239, GHSA-54fx-42gc-7vw4, GHSA-79qm-7rj5-m7r9, GHSA-f23p-vx2j-j53r,
   # GHSA-g6gw-c38x-mqfc, GHSA-crvj-82cr-hjcx, GHSA-gqvv-2mrq-wpjv, GHSA-hxh3-vqpv-xpqv
   # GHSA-5r4p-p66f-jhc7: serveStatic double-decode middleware bypass
-  "hono@>=4.0.0 <4.13.11": "4.13.11"
+  "hono@>=4.0.0 <4.13.11": "4.13.16"
 
   # CVE-2026-48779: ws DoS via oversized headers. Only the 8.x line is
   # affected (8.18.0/8.20.1 in-tree); ws@7.5.11 is already patched, leave it.
