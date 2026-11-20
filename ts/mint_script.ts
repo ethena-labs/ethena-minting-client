@@ -29,6 +29,7 @@ const ALLOW_INFINITE_APPROVALS = false;
 // Asset addresses
 const USDC_ADDRESS: Address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const USDT_ADDRESS: Address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+const USDE_ADDRESS: Address = "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3";
 
 async function main() {
   try {
@@ -57,19 +58,31 @@ async function main() {
 
     console.log("Order", order);
 
+    // A mint pulls the collateral from the benefactor; a redeem burns the
+    // benefactor's USDe with burnFrom, so the minting contract needs a USDe
+    // allowance instead.
+    const usdeAmount = parseScientificOrNonScientificToBigInt(
+      order.usde_amount
+    );
+    const collateralAmount = parseScientificOrNonScientificToBigInt(
+      order.collateral_amount
+    );
+    const approvalAddress = SIDE === "MINT" ? collateralAddress : USDE_ADDRESS;
+    const requiredAllowance = SIDE === "MINT" ? collateralAmount : usdeAmount;
+
     // Get allowance
-    const allowance = await getAllowance(collateralAddress, PRIVATE_KEY);
+    const allowance = await getAllowance(approvalAddress, PRIVATE_KEY);
     console.log("Allowance", allowance);
 
     // Determine if approval required
-    if (allowance < bigIntAmount(AMOUNT)) {
+    if (allowance < requiredAllowance) {
       // Approving
       let txHash: Hex;
 
       // Reset allowance for USDT before approving
-      if (COLLATERAL_ASSET === "USDT" && allowance > 0) {
+      if (approvalAddress === USDT_ADDRESS && allowance > 0) {
         const revokeTxHash = await approve(
-          collateralAddress,
+          approvalAddress,
           PRIVATE_KEY,
           bigIntAmount(0)
         );
@@ -83,9 +96,9 @@ async function main() {
       }
 
       txHash = await approve(
-        collateralAddress,
+        approvalAddress,
         PRIVATE_KEY,
-        ALLOW_INFINITE_APPROVALS ? UINT256_MAX : bigIntAmount(AMOUNT)
+        ALLOW_INFINITE_APPROVALS ? UINT256_MAX : requiredAllowance
       );
       console.log(`Approval submitted: https://etherscan.io/tx/${txHash}`);
 
@@ -101,10 +114,8 @@ async function main() {
       nonce: BigInt(order.nonce),
       order_type: order.order_type === Side.MINT ? 0 : 1,
       expiry: BigInt(order.expiry),
-      usde_amount: parseScientificOrNonScientificToBigInt(order.usde_amount),
-      collateral_amount: parseScientificOrNonScientificToBigInt(
-        order.collateral_amount
-      ),
+      usde_amount: usdeAmount,
+      collateral_amount: collateralAmount,
     };
 
     console.log("OrderSigning", orderSigning);
