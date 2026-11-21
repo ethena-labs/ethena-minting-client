@@ -13,7 +13,8 @@ import {
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
-import { MINT_ADDRESS } from "./constants";
+import { MINT_ADDRESS, USDE_ADDRESS } from "./constants";
+import { approvalFor } from "./approval";
 import { Side } from "./types";
 
 // Configuration
@@ -29,7 +30,6 @@ const ALLOW_INFINITE_APPROVALS = false;
 // Asset addresses
 const USDC_ADDRESS: Address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const USDT_ADDRESS: Address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
-const USDE_ADDRESS: Address = "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3";
 
 async function main() {
   try {
@@ -58,17 +58,24 @@ async function main() {
 
     console.log("Order", order);
 
-    // A mint pulls the collateral from the benefactor; a redeem burns the
-    // benefactor's USDe with burnFrom, so the minting contract needs a USDe
-    // allowance instead.
+    // The approval follows the order the RFQ returned, the same field the
+    // signed order uses below; refuse an order whose side is not the one asked for.
+    if (String(order.order_type) !== SIDE) {
+      throw new Error(
+        `RFQ returned a ${order.order_type} order for a ${SIDE} request`
+      );
+    }
     const usdeAmount = parseScientificOrNonScientificToBigInt(
       order.usde_amount
     );
     const collateralAmount = parseScientificOrNonScientificToBigInt(
       order.collateral_amount
     );
-    const approvalAddress = SIDE === "MINT" ? collateralAddress : USDE_ADDRESS;
-    const requiredAllowance = SIDE === "MINT" ? collateralAmount : usdeAmount;
+    const { token: approvalAddress, amount: requiredAllowance } = approvalFor(
+      order.order_type,
+      { token: collateralAddress, amount: collateralAmount },
+      { token: USDE_ADDRESS, amount: usdeAmount }
+    );
 
     // Get allowance
     const allowance = await getAllowance(approvalAddress, PRIVATE_KEY);

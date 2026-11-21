@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "mint": "ts-node ts/mint_script.ts"
+    "mint": "ts-node ts/mint_script.ts",
+    "test": "node --require ts-node/register --test ts/approval.test.ts"
   },
   "keywords": [],
   "author": "",
