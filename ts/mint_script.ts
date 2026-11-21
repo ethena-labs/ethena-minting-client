@@ -13,7 +13,8 @@ import {
 import { ETHENA_MINTING_ABI } from "./minting_abi";
 import { mainnet } from "viem/chains";
 import { parseScientificOrNonScientificToBigInt } from "./parse_number";
-import { MINT_ADDRESS } from "./constants";
+import { MINT_ADDRESS, USDE_ADDRESS } from "./constants";
+import { approvalFor } from "./approval";
 import { Side } from "./types";
 
 // Configuration
@@ -57,19 +58,38 @@ async function main() {
 
     console.log("Order", order);
 
+    // The approval follows the order the RFQ returned, the same field the
+    // signed order uses below; refuse an order whose side is not the one asked for.
+    if (String(order.order_type) !== SIDE) {
+      throw new Error(
+        `RFQ returned a ${order.order_type} order for a ${SIDE} request`
+      );
+    }
+    const usdeAmount = parseScientificOrNonScientificToBigInt(
+      order.usde_amount
+    );
+    const collateralAmount = parseScientificOrNonScientificToBigInt(
+      order.collateral_amount
+    );
+    const { token: approvalAddress, amount: requiredAllowance } = approvalFor(
+      order.order_type,
+      { token: collateralAddress, amount: collateralAmount },
+      { token: USDE_ADDRESS, amount: usdeAmount }
+    );
+
     // Get allowance
-    const allowance = await getAllowance(collateralAddress, PRIVATE_KEY);
+    const allowance = await getAllowance(approvalAddress, PRIVATE_KEY);
     console.log("Allowance", allowance);
 
     // Determine if approval required
-    if (allowance < bigIntAmount(AMOUNT)) {
+    if (allowance < requiredAllowance) {
       // Approving
       let txHash: Hex;
 
       // Reset allowance for USDT before approving
-      if (COLLATERAL_ASSET === "USDT" && allowance > 0) {
+      if (approvalAddress === USDT_ADDRESS && allowance > 0) {
         const revokeTxHash = await approve(
-          collateralAddress,
+          approvalAddress,
           PRIVATE_KEY,
           bigIntAmount(0)
         );
@@ -83,9 +103,9 @@ async function main() {
       }
 
       txHash = await approve(
-        collateralAddress,
+        approvalAddress,
         PRIVATE_KEY,
-        ALLOW_INFINITE_APPROVALS ? UINT256_MAX : bigIntAmount(AMOUNT)
+        ALLOW_INFINITE_APPROVALS ? UINT256_MAX : requiredAllowance
       );
       console.log(`Approval submitted: https://etherscan.io/tx/${txHash}`);
 
@@ -101,10 +121,8 @@ async function main() {
       nonce: BigInt(order.nonce),
       order_type: order.order_type === Side.MINT ? 0 : 1,
       expiry: BigInt(order.expiry),
-      usde_amount: parseScientificOrNonScientificToBigInt(order.usde_amount),
-      collateral_amount: parseScientificOrNonScientificToBigInt(
-        order.collateral_amount
-      ),
+      usde_amount: usdeAmount,
+      collateral_amount: collateralAmount,
     };
 
     console.log("OrderSigning", orderSigning);
